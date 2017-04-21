@@ -33,10 +33,10 @@ pip install requirements.txt
 ### Requisitos ###
 
 * NO USAR PYTHON 2
-** Esta aplicación se escribe con Python 3, y se despliega en entornos Python 3
+    * Esta aplicación se escribe con Python 3, y se despliega en entornos Python 3
 
 * NO INCLUIR CAMBIOS A **DATABASES** EN *emitech/settings.py*
-** Emitech API funciona sobre una db PostgreSQL en producción, no cambie esa parte de los settings
+    * Emitech API funciona sobre una db PostgreSQL en producción, no cambie esa parte de los settings
 
 * NO USAR DJANGO TEMPLATES
-** El objetivo de esta aplicación es meramente la de ser una API, por lo que no debe incluir
+    * El objetivo de esta aplicación es meramente la de ser una API, por lo que no debe incluir
