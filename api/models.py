@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 
+
 # Create your models here.
 
 
@@ -19,14 +20,28 @@ class Product(models.Model):
 
 class Stock(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name="stocks")
-    unique_idenfitier= models.CharField(max_length=18, null=True)
+    unique_idenfitier = models.CharField(max_length=18, null=True)
     cost = models.DecimalField(max_digits=7, decimal_places=2)
 
 
 class Cart(models.Model):
+    CREDITCARD = 'CC'
+    DEBITCARD = 'DC'
+    CASH = 'CS'
+    PAYPAL = 'PY'
+
+    PAYMENT_CHOICES = (
+        (CREDITCARD, 'CC'),
+        (DEBITCARD, 'DC'),
+        (CASH, 'CS'),
+        (PAYPAL, 'PY')
+    )
+
     appuser = models.ForeignKey(AppUser, on_delete=models.PROTECT, related_name="carts")
     total_cost = models.DecimalField(max_digits=8, decimal_places=2)
     purchased = models.BooleanField(default=False)
+    payment = models.CharField(max_length=2, choices=PAYMENT_CHOICES, null=True)
+
 
 class ProductCart(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
