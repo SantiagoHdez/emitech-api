@@ -31,6 +31,6 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        field = ('appuser', 'products', 'total_cost', 'purchased')
+        field = ('appuser', 'products', 'total_cost', 'purchased', 'payment')
 
 
