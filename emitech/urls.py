@@ -19,5 +19,6 @@ from api import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^users/$', views.AppUserList.as_view())
+    url(r'^users/$', views.AppUserList.as_view()),
+    url(r'^users/(?P<pk>[0-9]{1,})/$', views.AppUserDetail.as_view())
 ]
