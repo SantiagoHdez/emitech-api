@@ -1,3 +1,27 @@
-<h1>
-  {{title}}
-</h1>
+<section class="menu-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="navbar-collapse collapse ">
+          <ul id="menu-top" class="nav navbar-nav navbar-right">
+            <li><a routerLink = "/products" (click)="changeView()" [ngClass]="{'menu-top-active': actualPage == 'products' }">Productos</a></li>
+            <li><a routerLink = "/cart" (click)="changeView()" [ngClass]="{'menu-top-active': actualPage == 'cart' }"> Mi carrito </a></li>
+            <li><a routerLink = "/user" (click)="changeView()"  [ngClass]="{'menu-top-active': actualPage == 'user' }">Mi cuenta</a></li>
+            <li><a >Forms</a></li>
+            <li><a href="blank.html">Blank Page</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+    <!-- MENU SECTION END-->
+    <div class="content-wrapper">
+        <div class="container">
+          <router-outlet></router-outlet>
+          <div *ngIf="isIndex">
+            hola
+          </div>
+        </div>
+    </div>
+
