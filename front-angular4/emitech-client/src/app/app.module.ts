@@ -11,6 +11,9 @@ import { RouterModule } from '@angular/router'; // router
 // urls
 import { UrlsRoutes } from './urls';
 
+//services
+import { ProductsService } from './products.service'
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -23,7 +26,7 @@ import { UrlsRoutes } from './urls';
     HttpModule,
     RouterModule.forRoot(new UrlsRoutes().getUrls()),
   ],
-  providers: [],
+  providers: [ProductsService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -16,14 +16,11 @@ export class AppComponent {
       if(this.i == 1)
         this.separateUrl(window.location.pathname);
       this.i++; 
-  });
-    
+      }); 
   }
   ngOnInit(){
     this.isIndex = true;
   }
-
-
   changeView(){
     this.isIndex = false;
     this.i = 0;

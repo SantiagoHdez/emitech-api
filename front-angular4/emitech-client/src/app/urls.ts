@@ -1,7 +1,7 @@
 import { ProductComponent } from './product/product.component';
 import { UserComponent } from './user/user.component';
 export class UrlsRoutes {
-  private routerUrls = [
+  public routerUrls = [
       {
         path : 'products', 
         component : ProductComponent

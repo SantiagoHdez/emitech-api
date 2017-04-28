@@ -15,10 +15,10 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from api import views
+from api import views as api_views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^users/$', views.AppUserList.as_view()),
-    url(r'^users/(?P<pk>[0-9]{1,})/$', views.AppUserDetail.as_view())
+    url(r'^users/$', api_views.AppUserList.as_view()),
+    url(r'^users/(?P<pk>[0-9]{1,})/$', api_views.AppUserDetail.as_view())
 ]
