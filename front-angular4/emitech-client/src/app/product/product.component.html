@@ -1,3 +1,47 @@
-<p>
-  product works!
-</p>
+<div class="row">
+  <div class="col-md-12">
+    <h4 class="page-head-line">Lista de productos
+      <button class="btn btn-primary btn-sm" style="margin-left:70%;" data-toggle="modal" data-target="#myModal">Agregar producto</button>
+    </h4>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Agregar producto</h5>
+      </div>
+      <div class="modal-body">
+        <form>
+  <div class="form-group">
+    <label for="exampleInputEmail1">Nombre del producto</label>
+    <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Ej. Televisión 42 pulg.">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">Modelo del producto</label>
+    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Ej. 11450">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">Código del producto</label>
+    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Ej. 123456789">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">Precio del producto</label>
+    <input type="number" name="price" step="0.01" min="0.01"  placeholder="Ej. 50000" class="form-control"  >
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">Precio sugerido del producto (opcional)</label>
+    <input type="number" name="price" step="0.01" min="0.01"  placeholder="Ej. 50000" class="form-control"  >
+  </div>
+
+</form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary">Agregar producto</button>
+      </div>
+    </div>
+  </div>
+</div>

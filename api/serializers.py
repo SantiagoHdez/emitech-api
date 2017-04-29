@@ -11,7 +11,7 @@ class AppUserSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        field = '__all__'
+        fields = '__all__'
 
 
 class StockSerializer(serializers.ModelSerializer):
