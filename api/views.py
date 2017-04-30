@@ -51,6 +51,7 @@ class ProductList(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None):
+        print (request.data)
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
