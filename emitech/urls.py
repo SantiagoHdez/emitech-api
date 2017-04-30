@@ -21,5 +21,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^users/$', api_views.AppUserList.as_view()),
     url(r'^users/(?P<pk>[0-9]{1,})/$', api_views.AppUserDetail.as_view()),
-    url(r'^products/$', api_views.ProductList.as_view())
+    url(r'^products/$', api_views.ProductList.as_view()),
+    url(r'^cart/(?P<pk>[0-9]{1,})/add-product/$', api_views.ProductCartView.as_view())
 ]

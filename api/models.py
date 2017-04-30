@@ -38,7 +38,7 @@ class Cart(models.Model):
     )
 
     appuser = models.ForeignKey(AppUser, on_delete=models.PROTECT, related_name="carts")
-    total_cost = models.DecimalField(max_digits=8, decimal_places=2)
+    total_cost = models.DecimalField(max_digits=8, decimal_places=2, default=0.0)
     purchased = models.BooleanField(default=False)
     payment = models.CharField(max_length=2, choices=PAYMENT_CHOICES, null=True)
 
@@ -48,4 +48,3 @@ class ProductCart(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="products")
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="products")
     quantity = models.IntegerField()
-
