@@ -102,16 +102,18 @@ class ProductCartView(APIView):
                     tmp_cart = Cart()
                     tmp_cart.appuser = AppUser.objects.get(pk=pk)
                     tmp_cart.save()
-                if Product.objects.filter(pk=serializer.product_id).exists():
-                    product = Product.objects.get(pk=serializer.product_id)
+                if Product.objects.filter(pk=serializer.data.get('product_id')).exists():
+                    product = Product.objects.get(pk=serializer.data.get('product_id'))
                     cart = Cart.objects.get(appuser_id=pk, purchased=False)
                     product_cart = ProductCart()
                     product_cart.product = product
                     product_cart.cart = cart
-                    product_cart.quantity = serializer.quantity
+                    product_cart.quantity = serializer.data.get('quantity')
                     product_cart.save()
+                    cart.total_cost = cart.total_cost + product.price
+                    cart.save()
                     cart_serializer = CartSerializer(cart)
-                    return Response(cart_serializer)
+                    return Response(cart_serializer.data)
                 else:
                     return Response(data="Product not found", status=status.HTTP_206_PARTIAL_CONTENT)
             else:

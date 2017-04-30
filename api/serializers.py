@@ -35,8 +35,5 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 class AddProductToCartSerializer(serializers.Serializer):
-    appuser_id = serializers.IntegerField()
     product_id = serializers.IntegerField()
-    override_price = serializers.BooleanField()
-    price = serializers.DecimalField(max_digits=7, decimal_places=2,allow_null=True)
     quantity = serializers.IntegerField(max_value=3)
