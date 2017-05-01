@@ -17,13 +17,13 @@ class ProductSerializer(serializers.ModelSerializer):
 class StockSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stock
-        field = '__all__'
+        fields = '__all__'
 
 
 class ProductCartSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductCart
-        field = '__all__'
+        fields = '__all__'
 
 
 class CartSerializer(serializers.ModelSerializer):
@@ -31,6 +31,9 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        field = ('appuser', 'products', 'total_cost', 'purchased', 'payment')
+        fields = ('appuser', 'products', 'total_cost', 'purchased', 'payment')
 
 
+class AddProductToCartSerializer(serializers.Serializer):
+    product_id = serializers.IntegerField()
+    quantity = serializers.IntegerField(max_value=3)
