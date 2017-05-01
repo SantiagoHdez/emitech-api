@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
@@ -14,6 +14,13 @@ import { UrlsRoutes } from './urls';
 //services
 import { ProductsService } from './products.service'
 
+//alertas
+import {ToastyModule} from 'ng2-toasty';
+
+//animaciones
+
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -22,9 +29,11 @@ import { ProductsService } from './products.service'
   ],
   imports: [
     BrowserModule,
-    FormsModule,
+    ReactiveFormsModule,
     HttpModule,
+    BrowserAnimationsModule,
     RouterModule.forRoot(new UrlsRoutes().getUrls()),
+    ToastyModule.forRoot()
   ],
   providers: [ProductsService],
   bootstrap: [AppComponent]

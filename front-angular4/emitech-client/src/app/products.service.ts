@@ -11,8 +11,15 @@ export class ProductsService {
   constructor(private http : Http ) {
   }
 
-  getUsersTest() {
-    return this.http.get("http://127.0.0.1:8000/users/?format=json")
+
+  getRegisteredProducts() {
+    return this.http.get("http://127.0.0.1:8000/products/?format=json")
+    .map(this.extractData)
+    .do(this.logData)
+    .catch(this.catchError);
+  }
+  addNewProduct(product){
+    return this.http.post("http://127.0.0.1:8000/products/", product)
     .map(this.extractData)
     .do(this.logData)
     .catch(this.catchError);

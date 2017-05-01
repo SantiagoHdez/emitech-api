@@ -5,43 +5,87 @@
     </h4>
   </div>
 </div>
+<!-- PRODUCTOS -->
+<div class="col-md-3 col-sm-12" *ngFor = "let product of registeredProducts">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      {{product.name}}
+    </div>
+    <div class="panel-body">
+      <p>
+        Modelo : {{product.model}} <br>
+        Código : {{product.code}} <br>
+        Precio : {{product.price}} <br>
+
+      </p>
+    </div>
+    <div class="panel-footer" style="text-align:center;">
+      <button type="button" class="btn btn-primary btn-sm">Agregar a mi carrito</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
 
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
+    <form [formGroup] = "addProductForm" (ngSubmit) = "add_product(addProductForm.value)" >
     <div class="modal-content">
+    
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Agregar producto</h5>
       </div>
       <div class="modal-body">
-        <form>
-  <div class="form-group">
-    <label for="exampleInputEmail1">Nombre del producto</label>
-    <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Ej. Televisión 42 pulg.">
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">Modelo del producto</label>
-    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Ej. 11450">
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">Código del producto</label>
-    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Ej. 123456789">
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">Precio del producto</label>
-    <input type="number" name="price" step="0.01" min="0.01"  placeholder="Ej. 50000" class="form-control"  >
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">Precio sugerido del producto (opcional)</label>
-    <input type="number" name="price" step="0.01" min="0.01"  placeholder="Ej. 50000" class="form-control"  >
-  </div>
+          <div class="form-group">
+            <label for="exampleInputEmail1">Nombre del producto</label>
+            <input type="text" class="form-control" name="name" placeholder="Ej. Televisión 42 pulg." formControlName = "name">
+            <span *ngIf= "this.addProductForm.controls.name.invalid && this.addProductForm.controls.name.touched;  then RequiredValidator"></span>
+          </div>
+          <div class="form-group">
+            <label for="exampleInputPassword1">Modelo del producto</label>
+            <input type="text" class="form-control" name="model" placeholder="Ej. 11450" formControlName = "model">
+            <span *ngIf= "this.addProductForm.controls.model.invalid && this.addProductForm.controls.model.touched;  then RequiredValidator"></span>
 
-</form>
+          </div>
+          <div class="form-group">
+            <label for="exampleInputPassword1">Código del producto</label>
+            <input type="text" class="form-control" name="code" placeholder="Ej. 123456789" formControlName = "code">
+            <span *ngIf= "this.addProductForm.controls.code.invalid && this.addProductForm.controls.code.touched;  then RequiredValidator"></span>
+          </div>
+          <div class="form-group">
+            <label for="exampleInputPassword1">Precio del producto</label>
+            <input type="number" name="price" step="0.01" min="0.01"  placeholder="Ej. 50000" class="form-control" formControlName = "price" >
+            <span *ngIf= "this.addProductForm.controls.price.invalid && this.addProductForm.controls.price.touched;  then RequiredValidator"></span>
+          </div>
+          
+          <div class="form-group" *ngIf = "isSuggestedPrice">
+            <label for="exampleInputPassword1">Precio sugerido del producto</label>
+            <input type="number" name="suggested_price" step="0.01" min="0.01"  placeholder="Ej. 50000" class="form-control" formControlName = "suggested_price" >
+          </div>
+          <div class="form-group">
+            <button class="btn btn-success" (click) = "add_suggested_price()" type="button">Deseo agregar un precio sugerido</button>
+          </div>
       </div>
+      
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-primary">Agregar producto</button>
+        <input type="submit" class="btn btn-primary" value="Agregar producto">
       </div>
     </div>
+    </form>
   </div>
 </div>
+<ng-template #RequiredValidator>
+      <span class="alert alert-danger pull-right" style="padding-top:0%; padding-bottom:0%;">
+        Por favor rellena este campo.
+      </span>
+</ng-template>
+<ng2-toasty></ng2-toasty>
