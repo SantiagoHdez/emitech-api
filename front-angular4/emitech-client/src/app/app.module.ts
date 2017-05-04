@@ -9,10 +9,12 @@ import { UserComponent } from './user/user.component';
 
 import { RouterModule } from '@angular/router'; // router 
 // urls
-import { UrlsRoutes } from './urls';
+import { routerUrls } from './urls';
 
 //services
-import { ProductsService } from './products.service'
+import { ProductsService } from './products.service';
+import { CartService } from './cart.service';
+
 
 //alertas
 import {ToastyModule} from 'ng2-toasty';
@@ -32,10 +34,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
     ReactiveFormsModule,
     HttpModule,
     BrowserAnimationsModule,
-    RouterModule.forRoot(new UrlsRoutes().getUrls()),
+    RouterModule.forRoot(routerUrls),
     ToastyModule.forRoot()
   ],
-  providers: [ProductsService],
+  providers: [ProductsService,CartService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

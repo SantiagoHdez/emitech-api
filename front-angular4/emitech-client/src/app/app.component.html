@@ -4,6 +4,7 @@
       <div class="col-md-12">
         <div class="navbar-collapse collapse ">
           <ul id="menu-top" class="nav navbar-nav navbar-right">
+            <li><a routerLink = "/" (click)="changeView()" [ngClass]="{'menu-top-active': isIndex }">Index</a></li>
             <li><a routerLink = "/products" (click)="changeView()" [ngClass]="{'menu-top-active': actualPage == 'products' }">Productos</a></li>
             <li><a routerLink = "/cart" (click)="changeView()" [ngClass]="{'menu-top-active': actualPage == 'cart' }"> Mi carrito </a></li>
             <li><a routerLink = "/user" (click)="changeView()"  [ngClass]="{'menu-top-active': actualPage == 'user' }">Mi cuenta</a></li>
@@ -20,7 +21,48 @@
         <div class="container">
           <router-outlet></router-outlet>
           <div *ngIf="isIndex">
-            hola
+            <div class="row">
+              <div class="col-md-12">
+                <h4 class="page-head-line">Iniciar sesión / Registro</h4>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            Iniciar sesión
+                        </div>
+                        <div class="panel-body">
+                          <form [formGroup] = "logInForm">
+                            <div class="form-group">
+                              <label for="exampleInputEmail1">Username</label>
+                              <input type="text" class="form-control" id="exampleInputEmail1" placeholder="Escribe tu nombre de usuario" formControlName="none">
+                            </div>
+                            <div class="form-group">
+                              <label for="exampleInputEmail1">Password</label>
+                              <input type="password" class="form-control" id="exampleInputEmail1" placeholder="Escribe tu contraseña" formControlName="none">
+                            </div>
+                          </form>
+                        </div>
+                        <div class="panel-footer text-right">
+                            <input type="submit"  value="Iniciar sesión" class="btn btn-primary btn-sm">
+                        </div>
+                    </div>
+              </div>
+              <div class="col-md-6">
+                <div class="panel panel-info">
+                        <div class="panel-heading">
+                            Registro(Disponible en el futuro)
+                        </div>
+                        <div class="panel-body text-center">
+                          <img src="http://www.sanpantaleon.com.ar/wp-content/uploads/2016/05/proximamente.png" alt="">
+                        </div>
+                        <div class="panel-footer">
+                            Panel Footer
+                        </div>
+                    </div>
+              </div>
+            </div>
           </div>
         </div>
     </div>

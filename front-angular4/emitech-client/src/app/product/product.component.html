@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-md-12">
     <h4 class="page-head-line">Lista de productos
-      <button class="btn btn-primary btn-sm" style="margin-left:70%;" data-toggle="modal" data-target="#myModal">Agregar producto</button>
+      <button class="btn btn-primary btn-sm" style="margin-left:70%;" data-toggle="modal" data-target="#addProductModal">Agregar producto</button>
     </h4>
   </div>
 </div>
@@ -16,11 +16,14 @@
         Modelo : {{product.model}} <br>
         Código : {{product.code}} <br>
         Precio : {{product.price}} <br>
-
       </p>
+      <div class="form-group">
+        <label for="pwd">Número de productos a agregar:</label>
+        <input type="number" class="form-control" id="numeroProducto{{product.id}}" value="1">
+      </div>
     </div>
     <div class="panel-footer" style="text-align:center;">
-      <button type="button" class="btn btn-primary btn-sm">Agregar a mi carrito</button>
+      <button type="button" class="btn btn-primary btn-sm" (click) = "set_pending_id(product.id)" data-target="#ConfirmationModal" data-toggle="modal" >Agregar a mi carrito</button>
     </div>
   </div>
 </div>
@@ -32,10 +35,27 @@
 
 
 
+<!-- Dialogo de confirmación-->
+
+<div class="modal fade" id="ConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    
+      <div class="modal-body">
+        <h5 class="modal-title text-center" id="exampleModalLabel">¿Estás seguro de querer agregar este/os producto/s?</h5>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal" style="margin-right:0%">Cancelar</button>
+        <input type="submit" class="btn btn-primary" data-dismiss="modal" value="Estoy seguro" style="margin-right:30%" (click) = "add_to_cart()">
+      </div>
+    </div>
+  </div>
+</div>
 
 
-<!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+<!-- agregar producto -->
+<div class="modal fade" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <form [formGroup] = "addProductForm" (ngSubmit) = "add_product(addProductForm.value)" >
     <div class="modal-content">
@@ -77,12 +97,14 @@
       
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-        <input type="submit" class="btn btn-primary" value="Agregar producto">
+        <input type="submit" class="btn btn-primary" value="Agregar producto" data-dismiss="modal">
       </div>
     </div>
     </form>
   </div>
 </div>
+
+
 <ng-template #RequiredValidator>
       <span class="alert alert-danger pull-right" style="padding-top:0%; padding-bottom:0%;">
         Por favor rellena este campo.

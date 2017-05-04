@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductsService }  from '../products.service';
+import { CartService } from '../cart.service';
+
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 import {ToastyService, ToastyConfig, ToastOptions, ToastData} from 'ng2-toasty';
 
@@ -12,10 +14,11 @@ export class ProductComponent implements OnInit {
   registeredProducts = [];
   isSuggestedPrice: boolean = false; 
   addProductForm: FormGroup;
+  idPendingProduct = 0;
   
 
-  constructor(private productsService: ProductsService,private toastyService:ToastyService, private toastyConfig: ToastyConfig) {
-    this.toastyConfig.theme = 'material';
+  constructor(private productsService: ProductsService,private toastyService:ToastyService, private toastyConfig: ToastyConfig, private cartService : CartService) {
+    this.toastyConfig.theme = 'bootstrap';
   }
   ngOnInit(){
     this.getRegisteredProducts();
@@ -47,7 +50,16 @@ export class ProductComponent implements OnInit {
       this.isSuggestedPrice = false; 
       this.getRegisteredProducts();
     }
-    this.toastyService.wait("hola");
+    this.toastyService.wait("Se ha agregado correctamente el producto.");
+  };
+
+  set_pending_id = function($idProduct){
+    this.idPendingProduct = $idProduct;
+  }
+  add_to_cart = function(){
+    let numProductos = parseFloat((<HTMLInputElement>document.getElementById("numeroProducto"+this.idPendingProduct)).value);
+    this.cartService.get_product(this.idPendingProduct,numProductos).subscribe((data) => this.cartService.add_product(data));
+    this.toastyService.success("Se ha agregado el producto a tus compras.Puedes ver tus productos registrados en el apartado 'Mi carrito'");
   };
 
 }

@@ -5,22 +5,27 @@ import 'rxjs/add/operator/catch';
 import { Observable } from 'rxjs/Observable';
 
 import { Http, Response } from '@angular/http';
+
+
 @Injectable()
-export class ProductsService {
-  constructor(private http : Http ) {
-  }
-  
-  getRegisteredProducts() {
-    return this.http.get("http://127.0.0.1:8000/products/?format=json")
+export class CartService {
+
+  private myCartProducts = [];
+  private numProductos = 0;
+  constructor(private http:Http) { }
+
+
+  public get_product($id,$numProductos){
+    this.numProductos = $numProductos;
+    let url = "http://127.0.0.1:8000/products/"+$id+"/?format=json";
+    return this.http.get(url)
     .map(this.extractData)
-    .do(this.logData)
     .catch(this.catchError);
   }
-  addNewProduct(product){
-    return this.http.post("http://127.0.0.1:8000/products/", product)
-    .map(this.extractData)
-    .do(this.logData)
-    .catch(this.catchError);
+
+  public add_product($product){
+    $product["numProductos"] = this.numProductos;
+    this.myCartProducts.push($product);
   }
   private catchError(error : Response | any){
     console.log(error); 
@@ -32,5 +37,4 @@ export class ProductsService {
   private extractData(res : Response){
     return res.json();
   }
-
 }

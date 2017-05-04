@@ -1,7 +1,6 @@
 import { ProductComponent } from './product/product.component';
 import { UserComponent } from './user/user.component';
-export class UrlsRoutes {
-  public routerUrls = [
+export let routerUrls = [
       {
         path : 'products', 
         component : ProductComponent
@@ -11,7 +10,3 @@ export class UrlsRoutes {
         component : UserComponent
       }
   ];
-  public getUrls(){
-    return this.routerUrls;
-  }
-}

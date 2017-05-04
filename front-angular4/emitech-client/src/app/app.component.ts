@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { Router, Event } from '@angular/router';
+import { FormControl, FormGroup, Validators } from '@angular/forms'
+
 
 @Component(
   {
@@ -11,6 +13,7 @@ export class AppComponent {
   isIndex: boolean;
   actualPage : String;
   i = 0;
+  logInForm : FormGroup;
   constructor(private router: Router) {
   this.router.events.subscribe((event: Event) => {            
       if(this.i == 1)
@@ -20,6 +23,9 @@ export class AppComponent {
   }
   ngOnInit(){
     this.isIndex = true;
+    this.logInForm = new FormGroup({
+      none : new FormControl()
+    });
   }
   changeView(){
     this.isIndex = false;
@@ -29,6 +35,8 @@ export class AppComponent {
     let url = $url.split('/');
     if(url[1] != "")
       this.isIndex = false;
+    else 
+      this.isIndex = true;
     this.actualPage = url[1];
     
   }
