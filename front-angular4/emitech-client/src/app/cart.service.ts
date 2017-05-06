@@ -27,6 +27,14 @@ export class CartService {
     $product["numProductos"] = this.numProductos;
     this.myCartProducts.push($product);
   }
+
+  public get_cart_products(){
+    return this.myCartProducts;
+  }
+
+
+
+
   private catchError(error : Response | any){
     console.log(error); 
     return Observable.throw(error.json().error || "Something happened");

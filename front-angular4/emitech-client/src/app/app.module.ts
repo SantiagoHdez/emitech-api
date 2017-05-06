@@ -21,13 +21,15 @@ import {ToastyModule} from 'ng2-toasty';
 
 //animaciones
 
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MyCartComponent } from './my-cart/my-cart.component'
 
 @NgModule({
   declarations: [
     AppComponent,
     ProductComponent,
-    UserComponent
+    UserComponent,
+    MyCartComponent
   ],
   imports: [
     BrowserModule,

@@ -6,7 +6,7 @@
           <ul id="menu-top" class="nav navbar-nav navbar-right">
             <li><a routerLink = "/" (click)="changeView()" [ngClass]="{'menu-top-active': isIndex }">Index</a></li>
             <li><a routerLink = "/products" (click)="changeView()" [ngClass]="{'menu-top-active': actualPage == 'products' }">Productos</a></li>
-            <li><a routerLink = "/cart" (click)="changeView()" [ngClass]="{'menu-top-active': actualPage == 'cart' }"> Mi carrito </a></li>
+            <li><a routerLink = "/my-cart" (click)="changeView()" [ngClass]="{'menu-top-active': actualPage == 'my-cart' }"> Mi carrito </a></li>
             <li><a routerLink = "/user" (click)="changeView()"  [ngClass]="{'menu-top-active': actualPage == 'user' }">Mi cuenta</a></li>
             <li><a >Forms</a></li>
             <li><a href="blank.html">Blank Page</a></li>

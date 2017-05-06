@@ -1,0 +1,61 @@
+<div class="row">
+  <div class="col-md-12">
+    <h4 class="page-head-line">Lista de productos
+      <button class="btn btn-primary btn-sm" style="margin-left:70%;" data-toggle="modal" data-target="#addProductModal">Agregar producto</button>
+    </h4>
+  </div>
+</div>
+<!-- PRODUCTOS -->
+<div *ngIf="cartProducts.length != 0; else SinProdutos">
+  <div class="col-md-3 col-sm-12" *ngFor = "let product of cartProducts; let index=index">
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        {{product.name}}
+      </div>
+      <div class="panel-body">
+        <p>
+          Modelo : {{product.model}} <br>
+          Código : {{product.code}} <br>
+          Precio : {{product.price}} <br>
+          Numero de productos : {{product.numProductos}}
+        </p>
+      </div>
+      <div class="panel-footer" style="text-align:center;">
+        <button type="button" class="btn btn-danger btn-sm" (click) = "drop_product_pending(index)" data-target="#ConfirmationModal" data-toggle="modal" >Eliminar de mi carrito</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<!-- Dialogo de confirmación-->
+
+<div class="modal fade" id="ConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    
+      <div class="modal-body">
+        <h5 class="modal-title text-center" id="exampleModalLabel">¿Estás seguro de querer elimiar este/os producto/s de tu carrito?</h5>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal" style="margin-right:0%">Cancelar</button>
+        <input type="submit" class="btn btn-primary" data-dismiss="modal" value="Estoy seguro" style="margin-right:30%" (click) = "drop_product()">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- No hay productos-->
+<ng-template #SinProdutos>
+ <div class="row">
+  <div class="col-md-12">
+    <div class="alert alert-warning">
+      No has agregado ningún producto. ¡Agrega algunos!
+    </div>
+    </div>
+  </div>
+</ng-template>
