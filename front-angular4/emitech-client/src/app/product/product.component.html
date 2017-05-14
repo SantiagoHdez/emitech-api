@@ -1,7 +1,8 @@
 <div class="row">
   <div class="col-md-12">
     <h4 class="page-head-line">Lista de productos
-      <button class="btn btn-primary btn-sm" style="margin-left:70%;" data-toggle="modal" data-target="#addProductModal">Agregar producto</button>
+      <button class="btn btn-primary btn-sm" style="margin-left:55%;" data-toggle="modal" data-target="#addProductModal">Agregar producto</button>
+      <button class="btn btn-primary btn-sm" style="margin-left:0%;" data-toggle="modal" data-target="#modifyDropProduct">Modificar/Eliminar producto</button>
     </h4>
   </div>
 </div>
@@ -27,10 +28,6 @@
     </div>
   </div>
 </div>
-
-
-
-
 
 
 
@@ -104,6 +101,87 @@
   </div>
 </div>
 
+
+<!-- modificar eliminar producto -->
+<div class="modal fade" id="modifyDropProduct" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Buscar producto</h5>
+      </div>
+      <div class="modal-body">
+          <form [formGroup] = "lookProduct"  >
+          <div class="form-group">
+            <input type="text" class="form-control" name="name" placeholder="Buscar producto por nombre." formControlName = "name" (keyup) = "look_product(lookProduct.value)" autocomplete="off">
+            <span *ngIf= "this.lookProduct.controls.name.invalid && this.lookProduct.controls.name.touched;  then RequiredValidator"></span>
+          </div>
+          </form>
+          <div *ngIf = "this.searchProducts.length != 0 && this.ProductIsSelected == false; then ProductosBusqueda; else SinProductosBusqueda"></div>
+          
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal" (click) = "reset_values_busqueda()">Cancelar</button>
+        <input type="submit" class="btn btn-primary" value="Agregar producto" data-dismiss="modal">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #ProductosBusqueda>
+  <ul >
+    <li *ngFor = "let producto of this.searchProducts">
+      <a (click)= "show_data_selected_product(producto.id)">{{producto.model}}</a>
+    </li>
+  </ul>
+</ng-template>
+
+
+<ng-template #formSelectedProduct>
+  producto seleccionado
+
+</ng-template>
+
+<ng-template #SinProductosBusqueda>
+      <span class="alert alert-warning" style="margin-left:35%" *ngIf = "!this.ProductIsSelected">
+        Sin coincidencias.
+      </span>
+      <div *ngIf = "this.ProductIsSelected">
+        <form [formGroup] = "modifyProductForm" (ngSubmit) = "add_product(modifyProductForm.value)" >
+          <div class="form-group">
+            <label for="exampleInputEmail1">Nombre del producto</label>
+            <input type="text" class="form-control" name="name" placeholder="Ej. Televisión 42 pulg." formControlName = "name">
+            <span *ngIf= "this.addProductForm.controls.name.invalid && this.addProductForm.controls.name.touched;  then RequiredValidator"></span>
+          </div>
+          <div class="form-group">
+            <label for="exampleInputPassword1">Modelo del producto</label>
+            <input type="text" class="form-control" name="model" placeholder="Ej. 11450" formControlName = "model">
+            <span *ngIf= "this.addProductForm.controls.model.invalid && this.addProductForm.controls.model.touched;  then RequiredValidator"></span>
+
+          </div>
+          <div class="form-group">
+            <label for="exampleInputPassword1">Código del producto</label>
+            <input type="text" class="form-control" name="code" placeholder="Ej. 123456789" formControlName = "code">
+            <span *ngIf= "this.addProductForm.controls.code.invalid && this.addProductForm.controls.code.touched;  then RequiredValidator"></span>
+          </div>
+          <div class="form-group">
+            <label for="exampleInputPassword1">Precio del producto</label>
+            <input type="number" name="price" step="0.01" min="0.01"  placeholder="Ej. 50000" class="form-control" formControlName = "price" >
+            <span *ngIf= "this.addProductForm.controls.price.invalid && this.addProductForm.controls.price.touched;  then RequiredValidator"></span>
+          </div>
+          
+          <div class="form-group" *ngIf = "isSuggestedPrice">
+            <label for="exampleInputPassword1">Precio sugerido del producto</label>
+            <input type="number" name="suggested_price" step="0.01" min="0.01"  placeholder="Ej. 50000" class="form-control" formControlName = "suggested_price" >
+          </div>
+          <div class="form-group">
+            <button class="btn btn-success" (click) = "add_suggested_price()" type="button">Deseo agregar un precio sugerido</button>
+          </div>
+        </form>
+      </div>
+</ng-template>
 
 <ng-template #RequiredValidator>
       <span class="alert alert-danger pull-right" style="padding-top:0%; padding-bottom:0%;">

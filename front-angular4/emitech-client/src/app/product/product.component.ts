@@ -16,6 +16,13 @@ export class ProductComponent implements OnInit {
   addProductForm: FormGroup;
   idPendingProduct = 0;
   
+  //busquedaProductos
+  lookProduct : FormGroup;
+  searchProducts = [];
+  ProductIsSelected = false; 
+  SelectedProduct;
+
+  modifyProductForm : FormGroup;
 
   constructor(private productsService: ProductsService,private toastyService:ToastyService, private toastyConfig: ToastyConfig, private cartService : CartService) {
     this.toastyConfig.theme = 'bootstrap';
@@ -28,6 +35,10 @@ export class ProductComponent implements OnInit {
       code: new FormControl("", Validators.required),
       price: new FormControl("",Validators.required),
       suggested_price : new FormControl()
+    });
+
+    this.lookProduct = new FormGroup({
+      name : new FormControl("", Validators.required)
     });
   }
   getRegisteredProducts(){
@@ -60,6 +71,39 @@ export class ProductComponent implements OnInit {
     let numProductos = parseFloat((<HTMLInputElement>document.getElementById("numeroProducto"+this.idPendingProduct)).value);
     this.cartService.get_product(this.idPendingProduct,numProductos).subscribe((data) => this.cartService.add_product(data));
     this.toastyService.success("Se ha agregado el producto a tus compras.Puedes ver tus productos registrados en el apartado 'Mi carrito'");
+  };
+
+  look_product = function($product){
+    this.searchProducts = [];
+    this.ProductIsSelected = false;
+    if($product.name.length != 0){
+      let regExx = new RegExp($product.name.toLowerCase());
+      for(let producto of this.registeredProducts){
+        if(producto.model.toLowerCase().search(regExx) != -1){
+         this.searchProducts.push(producto);
+        }
+      }
+    }
+  };
+  show_data_selected_product = function($id){
+    this.ProductIsSelected = true; 
+    this.searchProducts = [];
+    for(let producto of this.registeredProducts){
+        if(producto.id == $id){
+         this.SelectedProduct = producto;
+        }
+    }
+    this.modifyProductForm = new FormGroup({
+      name: new FormControl(this.SelectedProduct.name,Validators.required),
+      model: new FormControl(this.SelectedProduct.model, Validators.required),
+      code: new FormControl(this.SelectedProduct.code, Validators.required),
+      price: new FormControl(this.SelectedProduct.price,Validators.required),
+      suggested_price : new FormControl()
+    });
+  };
+  reset_values_busqueda = function(){
+    this.ProductIsSelected = false; 
+    this.searchProducts = [];
   };
 
 }

@@ -12,6 +12,7 @@ export class MyCartComponent implements OnInit {
   dropIdPending;
   cartProducts = []; 
   dropProductCart : FormGroup;
+  precio_pagar = 0;
   constructor(private cartService : CartService,private toastyService:ToastyService, private toastyConfig: ToastyConfig){
     this.toastyConfig.theme = 'bootstrap';
    }
@@ -22,6 +23,7 @@ export class MyCartComponent implements OnInit {
     this.dropProductCart = new FormGroup({
       numProducts : new FormControl()
     });
+    this.calculate_price(this.cartProducts);
   }
 
   drop_product_pending = function($id){
@@ -38,7 +40,15 @@ export class MyCartComponent implements OnInit {
     }else{
       this.cartProducts[this.dropIdPending].numProductos = this.cartProducts[this.dropIdPending].numProductos - this.dropProductCart.controls.numProducts.value;
       this.toastyService.success("Se han eliminado "+this.dropProductCart.controls.numProducts.value+" productos");
-  } 
+    }
+    this.calculate_price(this.cartProducts); 
+  };
+
+  calculate_price = function($cartProducts){
+    this.precio_pagar= 0;
+    for(let producto of $cartProducts){
+      this.precio_pagar += producto.numProductos* producto.price;
+    }
   };
 
 
