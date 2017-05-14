@@ -6,8 +6,14 @@
     </h4>
   </div>
 </div>
+
+<div *ngIf="this.loading; else registeredProductsTemplate">
+  <img src="assets/img/loading.gif" style="padding-left:40%; padding-top: 10%;">
+</div>
 <!-- PRODUCTOS -->
-<div class="col-md-3 col-sm-12" *ngFor = "let product of registeredProducts">
+<ng-template #registeredProductsTemplate>
+
+<div class="col-md-3 col-sm-12" *ngFor = "let product of this.registeredProducts">
   <div class="panel panel-primary">
     <div class="panel-heading">
       {{product.name}}
@@ -28,6 +34,9 @@
     </div>
   </div>
 </div>
+
+
+</ng-template>
 
 
 
@@ -54,7 +63,7 @@
 <!-- agregar producto -->
 <div class="modal fade" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
-    <form [formGroup] = "addProductForm" (ngSubmit) = "add_product(addProductForm.value)" >
+    <form [formGroup] = "addProductForm">
     <div class="modal-content">
     
       <div class="modal-header">
@@ -94,7 +103,7 @@
       
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-        <input type="submit" class="btn btn-primary" value="Agregar producto" data-dismiss="modal">
+        <input type="submit" class="btn btn-primary" value="Agregar producto" data-dismiss="modal" (click) = "add_product(addProductForm.value)" >
       </div>
     </div>
     </form>
@@ -122,8 +131,7 @@
       </div>
       
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-dismiss="modal" (click) = "reset_values_busqueda()">Cancelar</button>
-        <input type="submit" class="btn btn-primary" value="Agregar producto" data-dismiss="modal">
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click) = "reset_values_busqueda()">Cancelar</button>
       </div>
     </div>
   </div>
@@ -149,7 +157,7 @@
         Sin coincidencias.
       </span>
       <div *ngIf = "this.ProductIsSelected">
-        <form [formGroup] = "modifyProductForm" (ngSubmit) = "add_product(modifyProductForm.value)" >
+        <form [formGroup] = "modifyProductForm" >
           <div class="form-group">
             <label for="exampleInputEmail1">Nombre del producto</label>
             <input type="text" class="form-control" name="name" placeholder="Ej. Televisión 42 pulg." formControlName = "name">
@@ -179,6 +187,11 @@
           <div class="form-group">
             <button class="btn btn-success" (click) = "add_suggested_price()" type="button">Deseo agregar un precio sugerido</button>
           </div>
+          <div class="col-md-offset-4 col-sm-offset-3">
+            <button type="button" class="btn btn-danger" data-dismiss="modal" (click) = "reset_values_busqueda()">Eliminar producto</button>
+            <input type="submit" class="btn btn-primary" value="Modificar producto" data-dismiss="modal" (click) = "update_product(modifyProductForm.value)">
+          </div>
+          
         </form>
       </div>
 </ng-template>

@@ -22,6 +22,14 @@ export class ProductsService {
     .do(this.logData)
     .catch(this.catchError);
   }
+  updateProduct(id,product){
+    return this.http.put("http://127.0.0.1:8000/products/"+id+"/", product)
+    .map(this.extractData)
+    .do(this.logData)
+    .catch(this.catchError);
+  }
+
+
   private catchError(error : Response | any){
     console.log(error); 
     return Observable.throw(error.json().error || "Something happened");
