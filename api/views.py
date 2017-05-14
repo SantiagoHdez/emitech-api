@@ -114,7 +114,7 @@ class ProductCartView(APIView):
                     cart_serializer = CartSerializer(cart)
                     return Response(cart_serializer.data)
                 else:
-                    return Response(data="Product not found", status=status.HTTP_206_PARTIAL_CONTENT)
+                    return Response(data={"Message": "Product not found"}, status=status.HTTP_206_PARTIAL_CONTENT)
             else:
                 return Response(data="AppUser not found", status=status.HTTP_206_PARTIAL_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -142,7 +142,6 @@ class ProductCartView(APIView):
         else:
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class CartOperations(APIView):
     def get(self, request, pk, format=None):
         carts = Cart.objects.filter(appuser_id=pk)
@@ -167,6 +166,11 @@ class CartOperations(APIView):
                 elif serializer.data.get('payment_method') == 'PY':
                     cart.payment = cart.PAYPAL
                 cart.save()
+                cart_serializer = CartSerializer(cart)
+                if cart_serializer.is_valid():
+                    return Response(cart_serializer.data, status=status.HTTP_202_ACCEPTED)
+                else:
+                    return Response(cart_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -174,3 +178,24 @@ class CartOperations(APIView):
             tmp_cart.appuser = AppUser.objects.get(pk=pk)
             tmp_cart.save()
             raise Http404
+
+class StockList(APIView):
+    def get(self, request, pk, format=None):
+        stocks = Stock.objects.filter(product_id=pk)
+        serializer = StockSerializer(stocks, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, pk, format=None):
+        serializer = StockSerializer(data=request.data)
+        if serializer.is_valid():
+            if Stock.objects.filter(product_id=pk,
+                                    unique_identifier=serializer.data.get('unique_identifier')).exists():
+                return Response(serializer.data, status=status.HTTP_302_FOUND)
+            else:
+                serializer.save()
+                product = Product.objects.get(pk=pk)
+                product.units_aviable += 1
+                product.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
