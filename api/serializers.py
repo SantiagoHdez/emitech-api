@@ -37,3 +37,7 @@ class CartSerializer(serializers.ModelSerializer):
 class CartProductSerializer(serializers.Serializer):
     product_id = serializers.IntegerField()
     quantity = serializers.IntegerField(max_value=3, default=1, allow_null=True)
+
+
+class PurchasedCartSerializer(serializers.Serializer):
+    payment_method = serializers.CharField(max_length=2, min_length=2)
