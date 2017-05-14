@@ -114,6 +114,17 @@ class ProductCartView(APIView):
                         cart.save()
                         cart_serializer = CartSerializer(cart)
                         return Response(cart_serializer.data)
+                    elif product.units_aviable > 0:
+                        cart = Cart.objects.get(appuser_id=pk, purchased=False)
+                        product_cart = ProductCart()
+                        product_cart.product = product
+                        product_cart.cart = cart
+                        product_cart.quantity = product.units_aviable
+                        product_cart.save()
+                        cart.total_cost += (product.price * product_cart.quantity)
+                        cart.save()
+                        cart_serializer = CartSerializer(cart)
+                        return Response(cart_serializer.data)
                     else:
                         return Response(data={
                             "Message": "Not enough units aviable of product {0} with id {1}".format(product.name,
