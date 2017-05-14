@@ -36,7 +36,7 @@ class CartSerializer(serializers.ModelSerializer):
 
 class CartProductSerializer(serializers.Serializer):
     product_id = serializers.IntegerField()
-    quantity = serializers.IntegerField(max_value=3, default=1, allow_null=True)
+    quantity = serializers.IntegerField(max_value=7, default=1, allow_null=True)
 
 
 class PurchasedCartSerializer(serializers.Serializer):
