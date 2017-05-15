@@ -103,18 +103,35 @@ class ProductCartView(APIView):
                     tmp_cart.save()
                 if Product.objects.filter(pk=serializer.data.get('product_id')).exists():
                     product = Product.objects.get(pk=serializer.data.get('product_id'))
-                    cart = Cart.objects.get(appuser_id=pk, purchased=False)
-                    product_cart = ProductCart()
-                    product_cart.product = product
-                    product_cart.cart = cart
-                    product_cart.quantity = serializer.data.get('quantity')
-                    product_cart.save()
-                    cart.total_cost = cart.total_cost + product.price
-                    cart.save()
-                    cart_serializer = CartSerializer(cart)
-                    return Response(cart_serializer.data)
+                    if product.units_aviable >= serializer.data.get('quantity'):
+                        cart = Cart.objects.get(appuser_id=pk, purchased=False)
+                        product_cart = ProductCart()
+                        product_cart.product = product
+                        product_cart.cart = cart
+                        product_cart.quantity = serializer.data.get('quantity')
+                        product_cart.save()
+                        cart.total_cost += (product.price * product_cart.quantity)
+                        cart.save()
+                        cart_serializer = CartSerializer(cart)
+                        return Response(cart_serializer.data)
+                    elif product.units_aviable > 0:
+                        cart = Cart.objects.get(appuser_id=pk, purchased=False)
+                        product_cart = ProductCart()
+                        product_cart.product = product
+                        product_cart.cart = cart
+                        product_cart.quantity = product.units_aviable
+                        product_cart.save()
+                        cart.total_cost += (product.price * product_cart.quantity)
+                        cart.save()
+                        cart_serializer = CartSerializer(cart)
+                        return Response(cart_serializer.data)
+                    else:
+                        return Response(data={
+                            "Message": "Not enough units aviable of product {0} with id {1}".format(product.name,
+                                                                                                    product.id)},
+                            status=status.HTTP_401_UNAUTHORIZED)
                 else:
-                    return Response(data="Product not found", status=status.HTTP_206_PARTIAL_CONTENT)
+                    return Response(data={"Message": "Product not found"}, status=status.HTTP_206_PARTIAL_CONTENT)
             else:
                 return Response(data="AppUser not found", status=status.HTTP_206_PARTIAL_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -157,7 +174,7 @@ class CartOperations(APIView):
             serializer = PurchasedCartSerializer(data=request.data)
             if serializer.is_valid():
                 cart = Cart.objects.get(appuser_id=pk, purchased=False)
-                cart.purchased = True
+
                 if serializer.data.get('payment_method') == 'CC':
                     cart.payment = cart.CREDITCARD
                 elif serializer.data.get('payment_method') == 'DC':
@@ -166,7 +183,29 @@ class CartOperations(APIView):
                     cart.payment = cart.CASH
                 elif serializer.data.get('payment_method') == 'PY':
                     cart.payment = cart.PAYPAL
+                else:
+                    return Response(data={"Message": "Payment method not provided or invalid"},
+                                    status=status.HTTP_304_NOT_MODIFIED)
+
+                productcarts = cart.products
+                for productcart in productcarts:
+                    product = productcart.product
+                    if product.units_aviable < productcart.quantity:
+                        return Response(data={
+                            "Message": "Not enough units of product '" + product.name + "' with ID " + product.id + ""},
+                            status=status.HTTP_304_NOT_MODIFIED)
+                    else:
+                        product.units_aviable -= productcart.quantity
+                        product.save()
+
+                cart.purchased = True
+
                 cart.save()
+                cart_serializer = CartSerializer(cart)
+                if cart_serializer.is_valid():
+                    return Response(cart_serializer.data, status=status.HTTP_202_ACCEPTED)
+                else:
+                    return Response(cart_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -174,3 +213,25 @@ class CartOperations(APIView):
             tmp_cart.appuser = AppUser.objects.get(pk=pk)
             tmp_cart.save()
             raise Http404
+
+
+class StockList(APIView):
+    def get(self, request, pk, format=None):
+        stocks = Stock.objects.filter(product_id=pk)
+        serializer = StockSerializer(stocks, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, pk, format=None):
+        serializer = StockSerializer(data=request.data)
+        if serializer.is_valid():
+            if Stock.objects.filter(product_id=pk,
+                                    unique_identifier=serializer.data.get('unique_identifier')).exists():
+                return Response(serializer.data, status=status.HTTP_302_FOUND)
+            else:
+                serializer.save()
+                product = Product.objects.get(pk=pk)
+                product.units_aviable += 1
+                product.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

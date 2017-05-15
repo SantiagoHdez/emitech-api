@@ -16,11 +16,12 @@ class Product(models.Model):
     code = models.CharField(max_length=18)
     price = models.DecimalField(max_digits=7, decimal_places=2)
     suggested_price = models.DecimalField(max_digits=7, decimal_places=2, null=True)
+    units_aviable = models.IntegerField(default=0)
 
 
 class Stock(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name="stocks")
-    unique_idenfitier = models.CharField(max_length=18, null=True)
+    unique_identifier = models.CharField(max_length=18, null=True)
     cost = models.DecimalField(max_digits=7, decimal_places=2)
 
 
