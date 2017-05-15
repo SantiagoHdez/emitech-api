@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-md-12">
     <h4 class="page-head-line">Lista de productos
-      <button class="btn btn-primary btn-sm" style="margin-left:70%;" data-toggle="modal" data-target="#addProductModal">Pagar {{precio_pagar}}</button>
+      <button class="btn btn-primary btn-sm" style="margin-left:70%;" data-toggle="modal" data-target="#paymentModal">Total a pagar {{precio_pagar}}</button>
     </h4>
   </div>
 </div>
@@ -17,7 +17,7 @@
           Modelo : {{product.model}} <br>
           Código : {{product.code}} <br>
           Precio : {{product.price}} <br>
-          Numero de productos : {{product.numProductos}}
+          Numero de productos : {{product.quantity}}
         </p>
       </div>
       <div class="panel-footer" style="text-align:center;">
@@ -27,6 +27,38 @@
   </div>
 </div>
 
+
+
+
+<!-- Realizar pago -->
+<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+       <form [formGroup] = "paymentFormHtml"  >
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Método de pago</h5>
+      </div>
+      <div class="modal-body">
+         
+          <div class="form-group">
+            <select name="paymentOptions" id="" class="form-control" formControlName="payment_method">
+              <option value="CC" > Tarjeta de crédito</option>
+              <option value="DC"> Tarjeta de débito</option>
+              <option value="CS"> Efectivo</option>
+              <option value="PY"> PAYPAL </option>
+
+            </select>
+          </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" data-dismiss="modal" (click) = "send_cart(paymentFormHtml.value)">Realizar compra</button>
+      </div>
+    </form>          
+    </div>
+  </div>
+</div>
 
 
 
@@ -55,6 +87,9 @@
   </form>
 
 </div>
+
+
+
 
 
 <!-- No hay productos-->

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CartService } from '../cart.service'
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import {ToastyService, ToastyConfig, ToastOptions, ToastData} from 'ng2-toasty';
 
 @Component({
@@ -13,6 +13,8 @@ export class MyCartComponent implements OnInit {
   cartProducts = []; 
   dropProductCart : FormGroup;
   precio_pagar = 0;
+
+  paymentFormHtml : FormGroup;
   constructor(private cartService : CartService,private toastyService:ToastyService, private toastyConfig: ToastyConfig){
     this.toastyConfig.theme = 'bootstrap';
    }
@@ -22,6 +24,10 @@ export class MyCartComponent implements OnInit {
     console.log(this.cartProducts);
     this.dropProductCart = new FormGroup({
       numProducts : new FormControl()
+    });
+
+    this.paymentFormHtml = new FormGroup({
+      payment_method : new FormControl("",Validators.required)
     });
     this.calculate_price(this.cartProducts);
   }
@@ -47,8 +53,14 @@ export class MyCartComponent implements OnInit {
   calculate_price = function($cartProducts){
     this.precio_pagar= 0;
     for(let producto of $cartProducts){
-      this.precio_pagar += producto.numProductos* producto.price;
+      this.precio_pagar += producto.quantity* producto.price;
     }
+  };
+
+
+  send_cart = function($formValues){
+    console.log($formValues);
+    this.cartService.send_payment_method_to_api($formValues).subscribe((data)=>console.log(data));    
   };
 
 

@@ -30,6 +30,8 @@ export class ProductComponent implements OnInit {
   constructor(private productsService: ProductsService,private toastyService:ToastyService, private toastyConfig: ToastyConfig, private cartService : CartService) {
     this.toastyConfig.theme = 'bootstrap';
   }
+
+
   ngOnInit(){
     this.getRegisteredProducts();
     this.addProductForm = new FormGroup({
@@ -37,6 +39,7 @@ export class ProductComponent implements OnInit {
       model: new FormControl("", Validators.required),
       code: new FormControl("", Validators.required),
       price: new FormControl("",Validators.required),
+      units_aviable : new FormControl("", Validators.required),
       suggested_price : new FormControl()
     });
 
@@ -50,7 +53,7 @@ export class ProductComponent implements OnInit {
     this.productsService.getRegisteredProducts().subscribe(data => this.registeredProducts = data);
     setTimeout(() => 
         this.loading = false
-    , 2000);
+    , 1000);
   }
   showData(){
     console.log(this.registeredProducts);
@@ -75,9 +78,18 @@ export class ProductComponent implements OnInit {
   }
   add_to_cart = function(){
     let numProductos = parseFloat((<HTMLInputElement>document.getElementById("numeroProducto"+this.idPendingProduct)).value);
-    this.cartService.get_product(this.idPendingProduct,numProductos).subscribe((data) => this.cartService.add_product(data));
-    this.toastyService.success("Se ha agregado el producto a tus compras.Puedes ver tus productos registrados en el apartado 'Mi carrito'");
+    this.cartService.get_product(this.idPendingProduct,numProductos).subscribe((data) => {
+      if(numProductos <= data.units_aviable){
+        this.cartService.add_product(data);
+        this.toastyService.success("Se ha agregado el producto a tus compras.Puedes ver tus productos registrados en el apartado 'Mi carrito'");
+      }else{
+        this.toastyService.error("No se ha podido agregar los productos a la compra, no existen unidades disponibles o estás excediendo el número de unidades disponibles.");
+      }
+      
+    });
   };
+
+
 
   look_product = function($product){
     this.searchProducts = [];
@@ -91,6 +103,7 @@ export class ProductComponent implements OnInit {
       }
     }
   };
+
 
   update_product = function(product){
     if(!this.modifyProductForm.invalid){
@@ -119,6 +132,7 @@ export class ProductComponent implements OnInit {
       model: new FormControl(this.SelectedProduct.model, Validators.required),
       code: new FormControl(this.SelectedProduct.code, Validators.required),
       price: new FormControl(this.SelectedProduct.price,Validators.required),
+      units_aviable : new FormControl(this.SelectedProduct.units_aviable, Validators.required),
       suggested_price : new FormControl()
     });
   };
