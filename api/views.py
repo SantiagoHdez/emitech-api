@@ -147,9 +147,12 @@ class ProductCartView(APIView):
                     raise Http404
                 if Product.objects.filter(pk=serializer.data.get('product_id')).exists():
                     cart = Cart.objects.get(appuser_id=pk, purchased=False)
-                    product_cart = ProductCart.objects.filter(product_id=serializer.data.get('product_id'),
-                                                              cart_id=cart.id)
+                    product_cart = ProductCart.objects.get(product_id=serializer.data.get('product_id'),
+                                                           cart_id=cart.id)
+
+                    cart.total_cost -= (product_cart.product.price * product_cart.quantity)
                     product_cart.delete()
+                    cart.save()
                     response_data = {"Message": "Product deleted from Cart"}
                     return Response(data=response_data, status=status.HTTP_204_NO_CONTENT)
                 else:
@@ -188,7 +191,7 @@ class CartOperations(APIView):
                                     status=status.HTTP_304_NOT_MODIFIED)
 
                 productcarts = cart.products
-                for productcart in productcarts:
+                for productcart in productcarts.all():
                     product = productcart.product
                     if product.units_aviable < productcart.quantity:
                         return Response(data={
@@ -202,7 +205,7 @@ class CartOperations(APIView):
 
                 cart.save()
                 cart_serializer = CartSerializer(cart)
-                if cart_serializer.is_valid():
+                if cart_serializer.is_valid:
                     return Response(cart_serializer.data, status=status.HTTP_202_ACCEPTED)
                 else:
                     return Response(cart_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
