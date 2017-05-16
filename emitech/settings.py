@@ -96,7 +96,8 @@ DATABASES = {
     }
 }
 
-
+#CREATE USER emitech_developer WITH PASSWORD 'testing';
+#create database emitech;
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
