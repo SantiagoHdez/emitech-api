@@ -174,43 +174,48 @@ class CartOperations(APIView):
 
     def post(self, request, pk, format=None):
         if Cart.objects.filter(appuser_id=pk, purchased=False).exists():
-            serializer = PurchasedCartSerializer(data=request.data)
-            if serializer.is_valid():
-                cart = Cart.objects.get(appuser_id=pk, purchased=False)
+            if Cart.objects.get(appuser_id=pk, purchased=False).products.count() > 0:
 
-                if serializer.data.get('payment_method') == 'CC':
-                    cart.payment = cart.CREDITCARD
-                elif serializer.data.get('payment_method') == 'DC':
-                    cart.payment = cart.DEBITCARD
-                elif serializer.data.get('payment_method') == 'CS':
-                    cart.payment = cart.CASH
-                elif serializer.data.get('payment_method') == 'PY':
-                    cart.payment = cart.PAYPAL
-                else:
-                    return Response(data={"Message": "Payment method not provided or invalid"},
-                                    status=status.HTTP_304_NOT_MODIFIED)
+                serializer = PurchasedCartSerializer(data=request.data)
+                if serializer.is_valid():
+                    cart = Cart.objects.get(appuser_id=pk, purchased=False)
 
-                productcarts = cart.products
-                for productcart in productcarts.all():
-                    product = productcart.product
-                    if product.units_aviable < productcart.quantity:
-                        return Response(data={
-                            "Message": "Not enough units of product '" + product.name + "' with ID " + product.id + ""},
-                            status=status.HTTP_304_NOT_MODIFIED)
+                    if serializer.data.get('payment_method') == 'CC':
+                        cart.payment = cart.CREDITCARD
+                    elif serializer.data.get('payment_method') == 'DC':
+                        cart.payment = cart.DEBITCARD
+                    elif serializer.data.get('payment_method') == 'CS':
+                        cart.payment = cart.CASH
+                    elif serializer.data.get('payment_method') == 'PY':
+                        cart.payment = cart.PAYPAL
                     else:
-                        product.units_aviable -= productcart.quantity
-                        product.save()
+                        return Response(data={"Message": "Payment method not provided or invalid"},
+                                        status=status.HTTP_304_NOT_MODIFIED)
 
-                cart.purchased = True
+                    productcarts = cart.products
+                    for productcart in productcarts.all():
+                        product = productcart.product
+                        if product.units_aviable < productcart.quantity:
+                            return Response(data={
+                                "Message": "Not enough units of product '" + product.name + "' with ID " + product.id + ""},
+                                status=status.HTTP_304_NOT_MODIFIED)
+                        else:
+                            product.units_aviable -= productcart.quantity
+                            product.save()
 
-                cart.save()
-                cart_serializer = CartSerializer(cart)
-                if cart_serializer.is_valid:
-                    return Response(cart_serializer.data, status=status.HTTP_202_ACCEPTED)
+                    cart.purchased = True
+
+                    cart.save()
+                    cart_serializer = CartSerializer(cart)
+                    if cart_serializer.is_valid:
+                        return Response(cart_serializer.data, status=status.HTTP_202_ACCEPTED)
+                    else:
+                        return Response(cart_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    return Response(cart_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(data={"Message": "Cart doesnt have products inside"},
+                                status=status.HTTP_304_NOT_MODIFIED)
         else:
             tmp_cart = Cart()
             tmp_cart.appuser = AppUser.objects.get(pk=pk)
