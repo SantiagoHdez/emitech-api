@@ -5,7 +5,7 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
+import json
 
 # Create your views here.
 
@@ -101,14 +101,14 @@ class ProductCartView(APIView):
                     tmp_cart = Cart()
                     tmp_cart.appuser = AppUser.objects.get(pk=pk)
                     tmp_cart.save()
-                if Product.objects.filter(pk=serializer.data.get('product_id')).exists():
-                    product = Product.objects.get(pk=serializer.data.get('product_id'))
-                    if product.units_aviable >= serializer.data.get('quantity'):
+                if Product.objects.filter(pk=serializer.validated_data['product_id']).exists():
+                    product = Product.objects.get(pk=serializer.validated_data['product_id'])
+                    if product.units_aviable >= serializer.validated_data['quantity']:
                         cart = Cart.objects.get(appuser_id=pk, purchased=False)
                         product_cart = ProductCart()
                         product_cart.product = product
                         product_cart.cart = cart
-                        product_cart.quantity = serializer.data.get('quantity')
+                        product_cart.quantity = serializer.validated_data['quantity']
                         product_cart.save()
                         cart.total_cost += (product.price * product_cart.quantity)
                         cart.save()
@@ -145,9 +145,9 @@ class ProductCartView(APIView):
                     tmp_cart.appuser = AppUser.objects.get(pk=pk)
                     tmp_cart.save()
                     raise Http404
-                if Product.objects.filter(pk=serializer.data.get('product_id')).exists():
+                if Product.objects.filter(pk=serializer.validated_data['product_id']).exists():
                     cart = Cart.objects.get(appuser_id=pk, purchased=False)
-                    product_cart = ProductCart.objects.get(product_id=serializer.data.get('product_id'),
+                    product_cart = ProductCart.objects.get(product_id=serializer.validated_data['product_id'],
                                                            cart_id=cart.id)
 
                     cart.total_cost -= (product_cart.product.price * product_cart.quantity)
@@ -180,13 +180,13 @@ class CartOperations(APIView):
                 if serializer.is_valid():
                     cart = Cart.objects.get(appuser_id=pk, purchased=False)
 
-                    if serializer.data.get('payment_method') == 'CC':
+                    if serializer.validated_data['payment_method'] == 'CC':
                         cart.payment = cart.CREDITCARD
-                    elif serializer.data.get('payment_method') == 'DC':
+                    elif serializer.validated_data['payment_method'] == 'DC':
                         cart.payment = cart.DEBITCARD
-                    elif serializer.data.get('payment_method') == 'CS':
+                    elif serializer.validated_data['payment_method'] == 'CS':
                         cart.payment = cart.CASH
-                    elif serializer.data.get('payment_method') == 'PY':
+                    elif serializer.validated_data['payment_method'] == 'PY':
                         cart.payment = cart.PAYPAL
                     else:
                         return Response(data={"Message": "Payment method not provided or invalid"},
@@ -233,13 +233,12 @@ class StockList(APIView):
         serializer = StockSerializer(data=request.data)
         if serializer.is_valid():
             if Stock.objects.filter(product_id=pk,
-                                    unique_identifier=serializer.data.get('unique_identifier')).exists():
+                                    unique_identifier=serializer.validated_data['unique_identifier']).exists():
                 return Response(serializer.data, status=status.HTTP_302_FOUND)
-            else:
-                serializer.save()
-                product = Product.objects.get(pk=pk)
-                product.units_aviable += 1
-                product.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            serializer.save()
+            product = Product.objects.get(pk=pk)
+            product.units_aviable += 1
+            product.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
