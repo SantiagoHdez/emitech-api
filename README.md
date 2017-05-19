@@ -30,6 +30,9 @@ pip install requirements.txt
 
 ## Contribuciones ##
 
+AWS Key:
+t1d9HL3+LXPhFR6fwF4LdnvB/eYuGrIl5lznMTg8
+
 ### Requisitos ###
 
 * NO USAR PYTHON 2

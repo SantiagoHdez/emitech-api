@@ -58,7 +58,8 @@ CORS_ORIGIN_WHITELIST = (
     'google.com',
     'hostname.example.com',
     'localhost:4200',
-    '127.0.0.1:9000'
+    '127.0.0.1:9000',
+    'ec2-35-166-42-252.us-west-2.compute.amazonaws.com'
 )
 
 ROOT_URLCONF = 'emitech.urls'
@@ -84,17 +85,28 @@ WSGI_APPLICATION = 'emitech.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'emitech',
-        'USER': 'emitech_developer',
-        'PASSWORD': 'testing',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+if 'RDS_HOSTNAME' in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['RDS_DB_NAME'],
+            'USER': os.environ['RDS_USERNAME'],
+            'PASSWORD': os.environ['RDS_PASSWORD'],
+            'HOST': os.environ['RDS_HOSTNAME'],
+            'PORT': os.environ['RDS_PORT'],
+        }
     }
-}
+else:    
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'emitech',
+            'USER': 'emitech_developer',
+            'PASSWORD': 'testing',
+            'HOST': '127.0.0.1',
+            'PORT': '5432',
+        }
+    }
 
 #CREATE USER emitech_developer WITH PASSWORD 'testing';
 #create database emitech;
