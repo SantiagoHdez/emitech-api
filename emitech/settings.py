@@ -25,7 +25,9 @@ SECRET_KEY = '()2_^oiak(($co^i@9gy&ycn_gmvhw+dsg6pg9mkqqhv##@n5*'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'django-env.hsphtebmem.us-west-2.elasticbeanstalk.com',
+]
 
 
 # Application definition
@@ -59,7 +61,7 @@ CORS_ORIGIN_WHITELIST = (
     'hostname.example.com',
     'localhost:4200',
     '127.0.0.1:9000',
-    'ec2-35-166-42-252.us-west-2.compute.amazonaws.com'
+    'django-env.hsphtebmem.us-west-2.elasticbeanstalk.com'
 )
 
 ROOT_URLCONF = 'emitech.urls'
