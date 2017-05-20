@@ -12,13 +12,14 @@ export class CartService {
 
   private myCartProducts = [];
   private numProductos = 0;
+  private url = "http://django-env.hsphtebmem.us-west-2.elasticbeanstalk.com";
   constructor(private http:Http) { }
 
 
   public get_product($id,$numProductos){
     this.numProductos = $numProductos;
-    let url = "http://127.0.0.1:8000/products/"+$id+"/?format=json";
-    return this.http.get(url)
+    //let url = "http://127.0.0.1:8000/products/"+$id+"/?format=json";
+    return this.http.get(this.url+"/products/"+$id+"/?format=json")
     .map(this.extractData)
     .catch(this.catchError);
   }
@@ -27,7 +28,6 @@ export class CartService {
     $product["quantity"] = this.numProductos;
     this.myCartProducts.push($product);
     this.send_cart_to_api($product).subscribe((data)=>console.log(data));    
-
   }
 
   public get_cart_products(){
@@ -35,16 +35,17 @@ export class CartService {
   }
 
   public send_cart_to_api($product){
-    let url = "http://127.0.0.1:8000/cart/1/";
-      delete $product.name;
-      delete $product.model;
-      delete $product.price;
-      delete $product.suggested_price;
-      delete $product.units_aviable;
-      delete $product.code;
-      $product['product_id'] = $product.id;
-      delete $product.id;      
-      return this.http.post(url,$product)
+      let $product_delete = Object.create($product);
+      //let url = "http://127.0.0.1:8000/cart/1/";
+      delete $product_delete.name;
+      delete $product_delete.model;
+      delete $product_delete.price;
+      delete $product_delete.suggested_price;
+      delete $product_delete.units_aviable;
+      delete $product_delete.code;
+      $product_delete['product_id'] = $product.id;
+      delete $product_delete.id;      
+      return this.http.post(this.url+"/cart/1/",$product_delete)
       .map(this.extractData)
       .catch(this.catchError);
     //return this.http.post(url,$product)
@@ -53,8 +54,8 @@ export class CartService {
   }
 
   public send_payment_method_to_api($method){
-    let url = "http://127.0.0.1:8000/cart/1/ops/";
-    return this.http.post(url,$method)
+    //let url = "http://127.0.0.1:8000/cart/1/ops/";
+    return this.http.post(this.url+"cart/1/ops/",$method)
     .map(this.extractData)
     .catch(this.catchError);
 
@@ -63,7 +64,8 @@ export class CartService {
 
   private catchError(error : Response | any){
     console.log(error); 
-    return Observable.throw(error.json().error || "Something happened");
+    //return Observable.throw(error.json().error || "Something happened");
+    return error.json();
   }
   private logData(res : Response){
     console.log(res);
