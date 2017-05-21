@@ -18,7 +18,8 @@ class AppUserList(APIView):
     def post(self, request, format=None):
         serializer = AppUserSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            new_appuser = AppUser(username=serializer.validated_data['username'], password=serializer.validated_data['password'])
+            new_appuser.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
