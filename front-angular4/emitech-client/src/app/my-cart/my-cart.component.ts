@@ -59,8 +59,7 @@ export class MyCartComponent implements OnInit {
 
 
   send_cart = function($formValues){
-    console.log($formValues);
-    this.cartService.send_payment_method_to_api($formValues).subscribe((data)=>console.log(data));    
+    this.cartService.send_payment_method_to_api($formValues).subscribe((data)=>console.log(data.status));    
   };
 
 

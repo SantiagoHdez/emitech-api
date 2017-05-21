@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, Event } from '@angular/router';
+import { Router, Event, NavigationEnd} from '@angular/router';
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 
 
@@ -15,9 +15,13 @@ export class AppComponent {
   i = 0;
   logInForm : FormGroup;
   constructor(private router: Router) {
-  this.router.events.subscribe((event: Event) => {            
-      if(this.i == 1)
-        this.separateUrl(window.location.pathname);
+  this.router.events.subscribe((event: Event) => {     
+      if(this.i == 1){
+        if(event instanceof NavigationEnd ){
+          this.separateUrl(event.url);
+        }        
+      }
+        
       this.i++; 
       }); 
   }
@@ -33,10 +37,10 @@ export class AppComponent {
   }
   separateUrl($url){
     let url = $url.split('/');
-    if(url[1] != "")
-      this.isIndex = false;
-    else 
+    if(url[1] == "")
       this.isIndex = true;
+    else 
+      this.isIndex = false;
     this.actualPage = url[1];
     
   }
