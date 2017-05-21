@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 import json
 
+
 # Create your views here.
 
 class AppUserList(APIView):
@@ -18,7 +19,8 @@ class AppUserList(APIView):
     def post(self, request, format=None):
         serializer = AppUserSerializer(data=request.data)
         if serializer.is_valid():
-            new_appuser = AppUser(username=serializer.validated_data['username'], password=serializer.validated_data['password'])
+            new_appuser = AppUser(username=serializer.validated_data['username'],
+                                  password=serializer.validated_data['password'])
             new_appuser.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -103,9 +105,23 @@ class ProductCartView(APIView):
                     tmp_cart.appuser = AppUser.objects.get(pk=pk)
                     tmp_cart.save()
                 if Product.objects.filter(pk=serializer.validated_data['product_id']).exists():
+                    cart = Cart.objects.get(appuser_id=pk, purchased=False)
+                    if cart.products.all().filter(product_id=serializer.validated_data['product_id']).exists():
+                        product_cart = cart.products.all().get(product_id=serializer.validated_data['product_id'])
+                        product = Product.objects.get(pk=serializer.validated_data['product_id'])
+                        """
+                        We should check for stock aviability
+                        """
+                        product_cart.quantity += serializer.validated_data['quantity']
+                        product_cart.save()
+                        cart.total_cost += (
+                            product.price * (product_cart.quantity - serializer.validated_data['quantity']))
+                        cart.save()
+                        cart_serializer = CartSerializer(cart)
+                        return Response(cart_serializer.data)
+
                     product = Product.objects.get(pk=serializer.validated_data['product_id'])
                     if product.units_aviable >= serializer.validated_data['quantity']:
-                        cart = Cart.objects.get(appuser_id=pk, purchased=False)
                         product_cart = ProductCart()
                         product_cart.product = product
                         product_cart.cart = cart
@@ -148,12 +164,23 @@ class ProductCartView(APIView):
                     raise Http404
                 if Product.objects.filter(pk=serializer.validated_data['product_id']).exists():
                     cart = Cart.objects.get(appuser_id=pk, purchased=False)
-                    product_cart = ProductCart.objects.get(product_id=serializer.validated_data['product_id'],
-                                                           cart_id=cart.id)
+                    if ProductCart.objects.filter(product_id=serializer.validated_data['product_id'],
+                                                  cart_id=cart.id).count() > 1:
+                        for product_cart in ProductCart.objects.filter(
+                                product_id=serializer.validated_data['product_id'],
+                                cart_id=cart.id):
+                            product_cart.delete()
 
-                    cart.total_cost -= (product_cart.product.price * product_cart.quantity)
-                    product_cart.delete()
-                    cart.save()
+                        cart.save()
+
+                    else:
+                        product_cart = ProductCart.objects.get(product_id=serializer.validated_data['product_id'],
+                                                               cart_id=cart.id)
+
+                        cart.total_cost -= (product_cart.product.price * product_cart.quantity)
+                        product_cart.delete()
+                        cart.save()
+
                     response_data = {"Message": "Product deleted from Cart"}
                     return Response(data=response_data, status=status.HTTP_204_NO_CONTENT)
                 else:

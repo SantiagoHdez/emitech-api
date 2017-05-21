@@ -29,8 +29,9 @@ pip install requirements.txt
 3. Configurar su base de datos de acuerdo a *emitech/settings.py*
 
 ## Contribuciones ##
-
-AWS Key:
+AWS Access Key:
+AKIAJJFJCGBOYC7LIKNQ
+AWS Secret Key:
 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
 
 ### Requisitos ###
