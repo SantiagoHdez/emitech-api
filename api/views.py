@@ -170,6 +170,7 @@ class ProductCartView(APIView):
                                 product_id=serializer.validated_data['product_id'],
                                 cart_id=cart.id):
                             product_cart.delete()
+                            cart.total_cost -= product_cart.product.price
 
                         cart.save()
 
