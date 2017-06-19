@@ -16,14 +16,14 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from api import views as api_views
+from rest_framework.authtoken import views as rest_framework_views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
+    url(r'^get-auth-token/$', rest_framework_views.obtain_auth_token),
 
-    url(r'^users/$', api_views.AppUserList.as_view()),
-    url(r'^users/(?P<pk>[0-9]{1,})/$', api_views.AppUserDetail.as_view()),
-
+    url(r'^users/$', api_views.UserList.as_view()),
 
     url(r'^products/$', api_views.ProductList.as_view()),
     url(r'^products/(?P<pk>[0-9]{1,})/$', api_views.ProductDetail.as_view()),

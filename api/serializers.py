@@ -1,10 +1,17 @@
 from rest_framework import serializers
 from api.models import AppUser, Product, Stock, Cart, ProductCart
+from django.contrib.auth.models import User
 
 
 class AppUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppUser
+        fields = '__all__'
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
         fields = '__all__'
 
 
@@ -31,12 +38,13 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields = ('appuser', 'products', 'total_cost', 'purchased', 'payment')
+        fields = ('user', 'products', 'total_cost', 'purchased', 'payment')
 
 
 class CartProductSerializer(serializers.Serializer):
     product_id = serializers.IntegerField()
-    quantity = serializers.IntegerField(max_value=7, default=1, allow_null=True)
+    quantity = serializers.IntegerField(
+        max_value=7, default=1, allow_null=True)
 
 
 class PurchasedCartSerializer(serializers.Serializer):
