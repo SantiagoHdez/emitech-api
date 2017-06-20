@@ -1,5 +1,10 @@
 # Changelog
 
+2017-06-19
+
+Replacement of DRF TokenAuthorization with Django OAuth Toolkit
+
+
 2017-06-11
 
 api/views.py

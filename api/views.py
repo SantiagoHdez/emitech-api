@@ -1,15 +1,38 @@
 from api.models import AppUser, Product, Stock, Cart, ProductCart
 from django.contrib.auth.models import User
-from api.serializers import AppUserSerializer, ProductSerializer, StockSerializer, CartSerializer, \
+from api.serializers import ProductSerializer, StockSerializer, CartSerializer, \
     ProductCartSerializer, CartProductSerializer, PurchasedCartSerializer, UserSerializer
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, IsAdminUser, AllowAny
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, TokenHasScope
 
 
 # Create your views here.
+
+class ClientList(APIView):
+    def get(self, request, format=None):
+        pass
+
+
+class NeoUserList(APIView):
+    permission_classes = (AllowAny, )
+
+    def post(self, request, format=None):
+        try:
+            user = User()
+            user.username = request.data['username']
+            user.password = request.data['password']
+            pass
+        except Exception as e:
+            raise
+        else:
+            pass
+        finally:
+            pass
+
 
 class UserList(APIView):
     def get(self, request, format=None):
@@ -66,7 +89,7 @@ class ProductDetail(APIView):
 class ProductCartView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request, pk, format=None):
+    def get(self, request, format=None):
         if Cart.objects.filter(user=request.user, purchased=False).exists() == False:
             tmp_cart = Cart()
             tmp_cart.user = request.user
@@ -87,15 +110,16 @@ class ProductCartView(APIView):
         # else:
         #     raise Http404
 
-    def post(self, request, pk, format=None):
+    def post(self, request, format=None):
         serializer = CartProductSerializer(data=request.data)
         if serializer.is_valid():
-            if Cart.objects.filter(user=request.user, purchased=False).exists() == False:
+            if Cart.objects.filter(user=request.user, purchased=False).exists() is False:
                 tmp_cart = Cart()
                 tmp_cart.user = request.user
                 tmp_cart.save()
             if Product.objects.filter(pk=serializer.validated_data['product_id']).exists():
-                product = Product.objects.get(pk=serializer.validated_data['product_id'])
+                product = Product.objects.get(
+                    pk=serializer.validated_data['product_id'])
                 if product.units_aviable >= serializer.validated_data['quantity']:
                     cart = Cart.objects.get(user=request.user, purchased=False)
                     product_cart = ProductCart()
@@ -108,7 +132,7 @@ class ProductCartView(APIView):
                     cart_serializer = CartSerializer(cart)
                     return Response(cart_serializer.data)
                 elif product.units_aviable > 0:
-                    cart = Cart.objects.get(user_id=pk, purchased=False)
+                    cart = Cart.objects.get(user=request.user, purchased=False)
                     product_cart = ProductCart()
                     product_cart.product = product
                     product_cart.cart = cart
@@ -122,25 +146,26 @@ class ProductCartView(APIView):
                     return Response(data={
                         "Message": "Not enough units aviable of product {0} with id {1}".format(product.name,
                                                                                                 product.id)},
-                        status=status.HTTP_401_UNAUTHORIZED)
+                                    status=status.HTTP_401_UNAUTHORIZED)
             else:
                 return Response(data={"Message": "Product not found"}, status=status.HTTP_206_PARTIAL_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk, format=None):
+    def delete(self, request, format=None):
         serializer = CartProductSerializer(data=request.data)
         if serializer.is_valid():
             if Cart.objects.filter(user=request.user, purchased=False).exists() == False:
                 tmp_cart = Cart()
-                tmp_cart.user = User.objects.get(pk=pk)
+                tmp_cart.user = request.user
                 tmp_cart.save()
                 raise Http404
             if Product.objects.filter(pk=serializer.validated_data['product_id']).exists():
-                cart = Cart.objects.get(user_id=pk, purchased=False)
+                cart = Cart.objects.get(user=request.user, purchased=False)
                 product_cart = ProductCart.objects.get(product_id=serializer.validated_data['product_id'],
                                                        cart_id=cart.id)
 
-                cart.total_cost -= (product_cart.product.price * product_cart.quantity)
+                cart.total_cost -= (product_cart.product.price *
+                                    product_cart.quantity)
                 product_cart.delete()
                 cart.save()
                 response_data = {"Message": "Product deleted from Cart"}
@@ -152,23 +177,22 @@ class ProductCartView(APIView):
 
 
 class CartOperations(APIView):
-    def get(self, request, pk, format=None):
-        carts = Cart.objects.filter(user_id=pk)
+    def get(self, request, format=None):
+        carts = Cart.objects.filter(user=request.user)
         serializer = CartSerializer(carts, many=True)
         if serializer.is_valid:
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def post(self, request, pk, format=None):
+    def post(self, request, format=None):
 
-
-        if Cart.objects.filter(user_id=pk, purchased=False).exists():
-            if Cart.objects.get(user_id=pk, purchased=False).products.count() > 0:
+        if Cart.objects.filter(user=request.user, purchased=False).exists():
+            if Cart.objects.get(user=request.user, purchased=False).products.count() > 0:
 
                 serializer = PurchasedCartSerializer(data=request.data)
                 if serializer.is_valid():
-                    cart = Cart.objects.get(user_id=pk, purchased=False)
+                    cart = Cart.objects.get(user=request.user, purchased=False)
 
                     if serializer.validated_data['payment_method'] == 'CC':
                         cart.payment = cart.CREDITCARD
@@ -208,11 +232,9 @@ class CartOperations(APIView):
                                 status=status.HTTP_304_NOT_MODIFIED)
         else:
             tmp_cart = Cart()
-            tmp_cart.user = User.objects.get(pk=pk)
+            tmp_cart.user = request.user
             tmp_cart.save()
             raise Http404
-
-
 
 
 class StockList(APIView):
