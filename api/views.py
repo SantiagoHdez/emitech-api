@@ -1,8 +1,9 @@
+import json
 from api.models import AppUser, Product, Stock, Cart, ProductCart
 from django.contrib.auth.models import User
 from api.serializers import ProductSerializer, StockSerializer, CartSerializer, \
-    ProductCartSerializer, CartProductSerializer, PurchasedCartSerializer, UserSerializer
-from django.http import Http404
+    ProductCartSerializer, CartProductSerializer, PurchasedCartSerializer, UserSerializer, CreateUserSerializer
+from django.http import Http404, JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -12,26 +13,17 @@ from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, Token
 
 # Create your views here.
 
-class ClientList(APIView):
-    def get(self, request, format=None):
-        pass
-
-
-class NeoUserList(APIView):
+class CreateUserView(APIView):
     permission_classes = (AllowAny, )
 
     def post(self, request, format=None):
-        try:
-            user = User()
-            user.username = request.data['username']
-            user.password = request.data['password']
-            pass
-        except Exception as e:
-            raise
+        user = User.objects.create_user(
+            username=request.data['username'], password=request.data['password'], email=request.data['email'])
+        serializer = CreateUserSerializer(data=user)
+        if serializer.is_valid():
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
         else:
-            pass
-        finally:
-            pass
+            raise Http404
 
 
 class UserList(APIView):
@@ -63,6 +55,15 @@ class ProductList(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class ProductSearchByUPC(APIView):
+    permission_classes = (AllowAny,)
+    
+    def get(self, request, barcode, format=None):
+            product = Product.objects.get(code=barcode)
+            serializer = ProductSerializer(product)
+            return Response(serializer.data)
+
+
 class ProductDetail(APIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
@@ -90,7 +91,7 @@ class ProductCartView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        if Cart.objects.filter(user=request.user, purchased=False).exists() == False:
+        if Cart.objects.filter(user=request.user, purchased=False).exists() is False:
             tmp_cart = Cart()
             tmp_cart.user = request.user
             tmp_cart.save()
@@ -154,7 +155,7 @@ class ProductCartView(APIView):
     def delete(self, request, format=None):
         serializer = CartProductSerializer(data=request.data)
         if serializer.is_valid():
-            if Cart.objects.filter(user=request.user, purchased=False).exists() == False:
+            if Cart.objects.filter(user=request.user, purchased=False).exists() is False:
                 tmp_cart = Cart()
                 tmp_cart.user = request.user
                 tmp_cart.save()
