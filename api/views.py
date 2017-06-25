@@ -26,20 +26,8 @@ class CreateUserView(APIView):
             raise Http404
 
 
-class UserList(APIView):
-    def get(self, request, format=None):
-        content = {
-            'user': str(request.user),  # `django.contrib.auth.User` instance.
-            'auth': str(request.auth),  # None
-        }
-        return Response(content)
-
-    def post(self, request, format=None):
-        raise Http404
-
-
 class ProductList(APIView):
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (AllowAny, )
 
     def get(self, request, format=None):
         products = Product.objects.all()
@@ -56,12 +44,12 @@ class ProductList(APIView):
 
 
 class ProductSearchByUPC(APIView):
-    permission_classes = (AllowAny,)
-    
+    permission_classes = (AllowAny, )
+
     def get(self, request, barcode, format=None):
-            product = Product.objects.get(code=barcode)
-            serializer = ProductSerializer(product)
-            return Response(serializer.data)
+        product = Product.objects.get(code=barcode)
+        serializer = ProductSerializer(product)
+        return Response(serializer.data)
 
 
 class ProductDetail(APIView):
@@ -88,7 +76,7 @@ class ProductDetail(APIView):
 
 
 class ProductCartView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
 
     def get(self, request, format=None):
         if Cart.objects.filter(user=request.user, purchased=False).exists() is False:
