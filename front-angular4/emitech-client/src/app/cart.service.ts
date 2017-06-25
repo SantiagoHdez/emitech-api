@@ -4,7 +4,7 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/catch';
 import { Observable } from 'rxjs/Observable';
 
-import { Http, Response } from '@angular/http';
+import { Http, Response, Headers, RequestOptions } from '@angular/http';
 
 
 @Injectable()
@@ -55,10 +55,18 @@ export class CartService {
 
   public send_payment_method_to_api($method){
     //let url = "http://127.0.0.1:8000/cart/1/ops/";
-    return this.http.post(this.url+"cart/1/ops/",$method)
+    return this.http.post(this.url+"/cart/1/ops/",$method)
     .map(this.extractData)
     .catch(this.catchError);
 
+  }
+  public drop_product($id){
+    let producto = {"product_id": String($id)};
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers, body: JSON.stringify({"product_id": String($id)}) });
+    return this.http.delete(this.url+"/cart/1/", options)
+    .map(this.extractData)
+    .catch(this.catchError);
   }
 
 

@@ -14,7 +14,7 @@ import { routerUrls } from './urls';
 //services
 import { ProductsService } from './products.service';
 import { CartService } from './cart.service';
-
+import { RegisterMachineService } from './register-machine.service'
 
 //alertas
 import {ToastyModule} from 'ng2-toasty';
@@ -22,14 +22,19 @@ import {ToastyModule} from 'ng2-toasty';
 //animaciones
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MyCartComponent } from './my-cart/my-cart.component'
+import { MyCartComponent } from './my-cart/my-cart.component';
+import { RegistermachineComponent } from './registermachine/registermachine.component';
+import { UserService } from './user.service';
+import { AuthService } from './auth.service';
+
 
 @NgModule({
   declarations: [
     AppComponent,
     ProductComponent,
     UserComponent,
-    MyCartComponent
+    MyCartComponent,
+    RegistermachineComponent,
   ],
   imports: [
     BrowserModule,
@@ -39,7 +44,7 @@ import { MyCartComponent } from './my-cart/my-cart.component'
     RouterModule.forRoot(routerUrls),
     ToastyModule.forRoot()
   ],
-  providers: [ProductsService,CartService],
+  providers: [ProductsService,CartService, RegisterMachineService, UserService, AuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

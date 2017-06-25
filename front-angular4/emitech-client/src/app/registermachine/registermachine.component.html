@@ -1,0 +1,86 @@
+<div class="row">
+  <div class="col-md-12">
+    <form [formGroup] = "registerMachineInputForm" (submit) = "look_for_product(registerMachineInputForm.value)">
+      <div class="form-group col-md-4 col-md-offset-4" >
+        <input type="text" placeholder="Código de barras" formControlName= "codigo_barras" class="form-control"  autofocus>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<div *ngIf = "this.actualProducts.length != 0 then actualProductsTemplate ;else noProducts">
+
+</div>
+
+<ng-template #actualProductsTemplate>
+  <div class = "row">
+    <div class="col-md-offset-2 col-md-8">
+      <div class="alert alert-success">
+        Total a pagar: ${{payment_money}}
+      </div>
+    </div>
+  </div>
+  <div class="row"> 
+  <div class="col-md-offset-2 col-md-8">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+        <th>Nombre</th>
+        <th>Modelo</th>
+        <th>Precio</th>
+        <th class="text-right">
+          <button class="btn btn-primary">
+            Proceder al pago
+          </button>
+        </th>
+        </tr>
+        <tr *ngFor= "let product of actualProducts; let $i = index">
+          <td class="info">{{product.name}} <span *ngIf="product.num_products != 1"> <b> x{{product.num_products}} </b></span></td>
+          <td class="info"> {{product.model}}</td>
+          <td class="info">${{product.price}}</td>
+          <td class ="info text-center"> 
+            <a style="cursor:pointer" (click) = "add_pending_to_drop_id($i)" data-target="#ConfirmationModal" data-toggle="modal"> 
+              <img src="http://www.freeiconspng.com/uploads/remove-icon-png-25.png" style="height: 30px; width: 30px;">
+            </a> 
+          </td>
+        </tr>
+      </thead>
+    </table>
+  </div>
+  
+</div>
+</ng-template>
+
+<ng-template #noProducts>
+<div class="alert alert-warning">
+  No ha agregado productos.
+</div>
+</ng-template>
+<ng2-toasty></ng2-toasty>
+
+
+
+
+<div class="modal fade" id="ConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <form [formGroup] = "dropProductRegisterMachine">
+    
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    
+      <div class="modal-body">
+        <h5 class="modal-title text-center" id="exampleModalLabel">¿Estás seguro de querer eliminar elementos?</h5>
+         <div class="form-group">
+            <label for="exampleInputEmail1">Productos a elimiar:</label>
+            <input type="number" class="form-control" name="numProducts" formControlName = "numProducts">
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal" style="margin-right:0%">Cancelar</button>
+        <input type="submit" class="btn btn-primary" data-dismiss="modal" value="Estoy seguro" style="margin-right:30%" (click) = "drop_product(dropProductRegisterMachine.value)">
+      </div>
+    </div>
+  </div>
+  </form>
+
+</div>

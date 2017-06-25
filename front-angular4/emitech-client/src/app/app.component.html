@@ -8,7 +8,7 @@
             <li><a routerLink = "/products" (click)="changeView()" [ngClass]="{'menu-top-active': actualPage == 'products' }">Productos</a></li>
             <li><a routerLink = "/my-cart" (click)="changeView()" [ngClass]="{'menu-top-active': actualPage == 'my-cart' }"> Mi carrito </a></li>
             <li><a routerLink = "/user" (click)="changeView()"  [ngClass]="{'menu-top-active': actualPage == 'user' }">Mi cuenta</a></li>
-            <li><a >Forms</a></li>
+            <li><a routerLink = "/register-machine" (click)="changeView()"  [ngClass]="{'menu-top-active': actualPage == 'register-machine' }">Caja Registradora</a></li>
             <li><a href="blank.html">Blank Page</a></li>
           </ul>
         </div>
@@ -28,26 +28,28 @@
             </div>
             <div class="row">
               <div class="col-md-6">
+                <form [formGroup] = "logInForm" (submit) = "log_in(logInForm.value)">
                 <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            Iniciar sesión
-                        </div>
-                        <div class="panel-body">
-                          <form [formGroup] = "logInForm">
-                            <div class="form-group">
-                              <label for="exampleInputEmail1">Username</label>
-                              <input type="text" class="form-control" id="exampleInputEmail1" placeholder="Escribe tu nombre de usuario" formControlName="none">
-                            </div>
-                            <div class="form-group">
-                              <label for="exampleInputEmail1">Password</label>
-                              <input type="password" class="form-control" id="exampleInputEmail1" placeholder="Escribe tu contraseña" formControlName="none">
-                            </div>
-                          </form>
-                        </div>
-                        <div class="panel-footer text-right">
-                            <input type="submit"  value="Iniciar sesión" class="btn btn-primary btn-sm">
-                        </div>
+                  
+                    <div class="panel-heading">
+                      Iniciar sesión
                     </div>
+                    <div class="panel-body">
+                      <div class="form-group">
+                        <label for="exampleInputEmail1">Username</label>
+                        <input type="text" class="form-control" id="exampleInputEmail1" placeholder="Escribe tu nombre de usuario" formControlName="username">
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleInputEmail1">Password</label>
+                        <input type="password" class="form-control" id="exampleInputEmail1" placeholder="Escribe tu contraseña" formControlName="password">
+                      </div>
+                    </div>
+                    <div class="panel-footer text-right">
+                      <input type="submit"  value="Iniciar sesión" class="btn btn-primary btn-sm">
+                    </div>
+                  
+                </div>
+              </form>
               </div>
               <div class="col-md-6">
                 <div class="panel panel-info">
@@ -67,3 +69,4 @@
         </div>
     </div>
 
+<ng2-toasty></ng2-toasty>
