@@ -176,15 +176,27 @@ class ProductCartView(APIView):
                 raise Http404
             if Product.objects.filter(pk=serializer.validated_data['product_id']).exists():
                 cart = Cart.objects.get(user=request.user, purchased=False)
-                product_cart = ProductCart.objects.get(product_id=serializer.validated_data['product_id'],
-                                                       cart_id=cart.id)
+                if ProductCart.objects.filter(product_id=serializer.validated_data['product_id'],
+                                                       cart_id=cart.id).count()>1:
+                    for product_cart in ProductCart.objects.filter(product_id=serializer.validated_data['product_id'],
+                                                       cart_id=cart.id).all():
+                        cart.total_cost -= (product_cart.product.price *
+                                            product_cart.quantity)
+                        product_cart.delete()
+                        cart.save()
 
-                cart.total_cost -= (product_cart.product.price *
-                                    product_cart.quantity)
-                product_cart.delete()
-                cart.save()
-                response_data = {"Message": "Product deleted from Cart"}
-                return Response(data=response_data, status=status.HTTP_204_NO_CONTENT)
+                    response_data = {"Message": "Product deleted from Cart"}
+                    return Response(data=response_data, status=status.HTTP_204_NO_CONTENT)
+                else:
+                    product_cart = ProductCart.objects.get(product_id=serializer.validated_data['product_id'],
+                                                           cart_id=cart.id)
+
+                    cart.total_cost -= (product_cart.product.price *
+                                        product_cart.quantity)
+                    product_cart.delete()
+                    cart.save()
+                    response_data = {"Message": "Product deleted from Cart"}
+                    return Response(data=response_data, status=status.HTTP_204_NO_CONTENT)
             else:
                 return Response(data="Product not found", status=status.HTTP_206_PARTIAL_CONTENT)
         else:
