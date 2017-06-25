@@ -21,7 +21,6 @@ export class MyCartComponent implements OnInit {
   
   ngOnInit() {
     this.cartProducts =  this.cartService.get_cart_products();
-    console.log(this.cartProducts);
     this.dropProductCart = new FormGroup({
       numProducts : new FormControl()
     });
@@ -35,16 +34,21 @@ export class MyCartComponent implements OnInit {
   drop_product_pending = function($id){
     this.dropIdPending = $id;
     this.dropProductCart.reset({
-      numProducts : this.cartProducts[$id].numProductos
+      numProducts : this.cartProducts[$id].quantity
     });
   };
 
   drop_product = function(){
-    if(this.dropProductCart.controls.numProducts.value == this.cartProducts[this.dropIdPending].numProductos){
-      this.cartProducts.splice(this.dropIdPending, 1);
+    console.log(this.cartProducts[this.dropIdPending])
+    if(this.dropProductCart.controls.numProducts.value == this.cartProducts[this.dropIdPending].quantity){
+      this.cartService.drop_product(this.cartProducts[this.dropIdPending].id).subscribe((data)=> {
+        console.log(data)
+        this.cartProducts.splice(this.dropIdPending, 1);
       this.toastyService.success("Se ha eliminado el producto.");
+    
+    });
     }else{
-      this.cartProducts[this.dropIdPending].numProductos = this.cartProducts[this.dropIdPending].numProductos - this.dropProductCart.controls.numProducts.value;
+      this.cartProducts[this.dropIdPending].quantity = this.cartProducts[this.dropIdPending].quantity - this.dropProductCart.controls.numProducts.value;
       this.toastyService.success("Se han eliminado "+this.dropProductCart.controls.numProducts.value+" productos");
     }
     this.calculate_price(this.cartProducts); 
@@ -59,7 +63,9 @@ export class MyCartComponent implements OnInit {
 
 
   send_cart = function($formValues){
-    this.cartService.send_payment_method_to_api($formValues).subscribe((data)=>console.log(data.status));    
+    this.cartService.send_payment_method_to_api($formValues).subscribe((data)=>{
+      this.toastyService.success("Se ha hecho el pago correctamente");
+    });    
   };
 
 

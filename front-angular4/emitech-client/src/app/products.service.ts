@@ -7,8 +7,16 @@ import { Observable } from 'rxjs/Observable';
 import { Http, Response } from '@angular/http';
 @Injectable()
 export class ProductsService {
-  private url = "http://django-env.hsphtebmem.us-west-2.elasticbeanstalk.com";
+  //private url = "http://django-env.hsphtebmem.us-west-2.elasticbeanstalk.com";
+  private url = "http://localhost:8000"
   constructor(private http : Http ) {
+  }
+
+  getProductRegisterMachine($id){
+    return this.http.get(this.url+"/products/"+$id+"/?format=json")
+    .map(this.extractData)
+    .do(this.logData)
+    .catch(this.catchError);
   }
   
   getRegisteredProducts() {
@@ -36,7 +44,7 @@ export class ProductsService {
 
   private catchError(error : Response | any){
     console.log(error); 
-    return Observable.throw(error.json().error || "Something happened");
+    return error.json();
   }
   private logData(res : Response){
     console.log(res);
