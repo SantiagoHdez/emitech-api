@@ -12,32 +12,9 @@ export class RegisterMachineService {
 
   constructor(private cartService: CartService, private http: Http, private auth:UserService) { }
 
-  private send_cart_to_api_one($product){
-    let $product_delete = Object.create($product);
-        $product_delete["quantity"] = $product.num_products;
-      //let url = "http://127.0.0.1:8000/cart/1/";
-        let headers = new Headers();
-        this.auth.createTokenHeader(headers);
-        delete $product_delete.name;
-        delete $product_delete.model;
-        delete $product_delete.price;
-        delete $product_delete.suggested_price;
-        delete $product_delete.units_aviable;
-        delete $product_delete.code;
-        $product_delete['product_id'] = $product.id;
-        delete $product_delete.id;      
-        
-        return this.http.post(this.url+"/cart/",$product_delete, {headers:headers})
-        .map(this.extractData)
-        .catch(this.catchError);
-  }
-
-  private send_cart_to_api_many($product){
-      
-      this.drop_product_api($product.id).subscribe(()=>{
+  private send_cart_to_api($product){
         let $product_delete = Object.create($product);
-        $product_delete["quantity"] = $product.num_products;
-      //let url = "http://127.0.0.1:8000/cart/1/";
+        $product_delete["quantity"] = 1;
         let headers = new Headers();
         this.auth.createTokenHeader(headers);
         delete $product_delete.name;
@@ -52,7 +29,6 @@ export class RegisterMachineService {
         return this.http.post(this.url+"/cart/",$product_delete, {headers:headers})
         .map(this.extractData)
         .catch(this.catchError);
-      });
       
   }
 
@@ -65,7 +41,9 @@ export class RegisterMachineService {
         this.cartService.get_product($product.id,$productIterator.num_products).subscribe((data) => {
           if($productIterator.num_products <= data.units_aviable){
             $productIterator.num_products++;
-            this.send_cart_to_api_many($productIterator);
+            this.send_cart_to_api($productIterator).subscribe(($data)=>{
+              console.log($data);
+            });
           }
         });
         break;
@@ -77,7 +55,9 @@ export class RegisterMachineService {
       this.cartService.get_product($product.id,$product.num_products).subscribe((data) => {
           if($product.num_products <= data.units_aviable){
             this.registerMachineActualProducts.push($product);
-            this.send_cart_to_api_one($product);
+            this.send_cart_to_api($product).subscribe(($data)=>{
+              console.log($data);
+            });
           }
         });
       
@@ -98,7 +78,9 @@ export class RegisterMachineService {
 
   get_payment_mont(){
     var payment = 0;
+    console.log("holaaa");
     for(let $product of this.registerMachineActualProducts){
+      console.log("hola",$product);
       payment += $product.num_products*$product.price;
     }
     return payment;
