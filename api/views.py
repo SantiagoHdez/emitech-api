@@ -116,7 +116,10 @@ class ProductCartView(APIView):
                         cart = Cart.objects.get(user=request.user, purchased=False)
                         product_cart.quantity += serializer.validated_data['quantity']
                         product_cart.save()
-                        cart.total_cost += (product.price * product_cart.quantity)
+                        tmp_total_cost = 0
+                        for product_cart in ProductCart.objects.filter(cart=cart).all():
+                            tmp_total_cost += product_cart.quantity * product_cart.product.price
+                        cart.total_cost = tmp_total_cost
                         cart.save()
                         cart_serializer = CartSerializer(cart)
                         return Response(cart_serializer.data)
@@ -124,7 +127,10 @@ class ProductCartView(APIView):
                         cart = Cart.objects.get(user=request.user, purchased=False)
                         product_cart.quantity += product.units_aviable
                         product_cart.save()
-                        cart.total_cost += (product.price * product_cart.quantity)
+                        tmp_total_cost = 0
+                        for product_cart in ProductCart.objects.filter(cart=cart).all():
+                            tmp_total_cost += product_cart.quantity * product_cart.product.price
+                        cart.total_cost = tmp_total_cost
                         cart.save()
                         cart_serializer = CartSerializer(cart)
                         return Response(cart_serializer.data)
