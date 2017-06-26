@@ -25,7 +25,7 @@ class Address(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=240)
     model = models.CharField(max_length=32)
-    code = models.CharField(max_length=18)
+    code = models.CharField(max_length=18, unique=True)
     price = models.DecimalField(max_digits=7, decimal_places=2)
     suggested_price = models.DecimalField(
         max_digits=7, decimal_places=2, null=True)

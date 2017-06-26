@@ -24,8 +24,6 @@ urlpatterns = [
 
     url(r'^users/create_user/$', api_views.CreateUserView.as_view()),
 
-    url(r'^users/$', api_views.UserList.as_view()),
-
     url(r'^products/$', api_views.ProductList.as_view()),
     url(r'^products/upc/(?P<barcode>[0-9]{1,13})/$', api_views.ProductSearchByUPC.as_view()),
     url(r'^products/(?P<pk>[0-9]{1,})/$', api_views.ProductDetail.as_view()),

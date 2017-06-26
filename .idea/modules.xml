@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/emitech.iml" filepath="$PROJECT_DIR$/emitech.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/emitech.iml" filepath="$PROJECT_DIR$/.idea/emitech.iml" />
     </modules>
   </component>
 </project>
