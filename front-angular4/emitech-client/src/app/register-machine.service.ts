@@ -46,6 +46,7 @@ export class RegisterMachineService {
             this.send_cart_to_api($productIterator).subscribe(($data)=>{
               console.log($data);
               this.payment = $data.total_cost;
+              console.log(this.payment);
             });
           }
         });
@@ -61,6 +62,7 @@ export class RegisterMachineService {
             this.send_cart_to_api($product).subscribe(($data)=>{
               console.log($data);
               this.payment = $data.total_cost;
+              console.log(this.payment);
             });
           }
         });
@@ -74,17 +76,27 @@ export class RegisterMachineService {
 
   drop_products($id, $products_to_drop){
     this.registerMachineActualProducts[$id].num_products -= $products_to_drop;
+    let id_product = this.registerMachineActualProducts[$id].id;
     if(this.registerMachineActualProducts[$id].num_products <= 0){
       this.registerMachineActualProducts.splice($id, 1);
+      this.drop_product_api(id_product).subscribe(($data)=>{
+        console.log($data);
+      });
     }
     return this.registerMachineActualProducts; 
   }
 
-  get_payment_mont(){
-    
-    return this.payment;
-  }
 
+  public send_payment_method_to_api($method){
+    //let url = "http://127.0.0.1:8000/cart/1/ops/";
+    this.registerMachineActualProducts = [];
+    let headers = new Headers();
+    this.auth.createTokenHeader(headers);
+    return this.http.post(this.url+"/cart/ops/",$method, {headers:headers})
+    .map(this.extractData)
+    .catch(this.catchError);
+
+  }
 
   private drop_product_api($id){
     let producto = {"product_id": String($id)};
@@ -94,6 +106,11 @@ export class RegisterMachineService {
     return this.http.delete(this.url+"/cart/", options)
     .map(this.extractData)
     .catch(this.catchError);
+  }
+
+  get_payment_mont(){
+    
+    return this.payment;
   }
 
   private catchError(error : Response | any){
