@@ -10,6 +10,8 @@ export class RegisterMachineService {
 
   private url = "http://localhost:8000";
 
+  payment = 0;
+
   constructor(private cartService: CartService, private http: Http, private auth:UserService) { }
 
   private send_cart_to_api($product){
@@ -43,6 +45,7 @@ export class RegisterMachineService {
             $productIterator.num_products++;
             this.send_cart_to_api($productIterator).subscribe(($data)=>{
               console.log($data);
+              this.payment = $data.total_cost;
             });
           }
         });
@@ -57,6 +60,7 @@ export class RegisterMachineService {
             this.registerMachineActualProducts.push($product);
             this.send_cart_to_api($product).subscribe(($data)=>{
               console.log($data);
+              this.payment = $data.total_cost;
             });
           }
         });
@@ -77,13 +81,8 @@ export class RegisterMachineService {
   }
 
   get_payment_mont(){
-    var payment = 0;
-    console.log("holaaa");
-    for(let $product of this.registerMachineActualProducts){
-      console.log("hola",$product);
-      payment += $product.num_products*$product.price;
-    }
-    return payment;
+    
+    return this.payment;
   }
 
 
