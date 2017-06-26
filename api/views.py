@@ -135,25 +135,30 @@ class ProductCartView(APIView):
                                         status=status.HTTP_401_UNAUTHORIZED)
 
                 else:
+                    cart = Cart.objects.get(user=request.user, purchased=False)
                     if product.units_aviable >= serializer.validated_data['quantity']:
-                        cart = Cart.objects.get(user=request.user, purchased=False)
                         product_cart = ProductCart()
                         product_cart.product = product
                         product_cart.cart = cart
                         product_cart.quantity = serializer.validated_data['quantity']
                         product_cart.save()
-                        cart.total_cost += (product.price * product_cart.quantity)
+                        tmp_total_cost = 0
+                        for product_cart in ProductCart.objects.filter(cart=cart).all():
+                            tmp_total_cost += product_cart.quantity * product_cart.product.price
+                        cart.total_cost = tmp_total_cost
                         cart.save()
                         cart_serializer = CartSerializer(cart)
                         return Response(cart_serializer.data)
                     elif product.units_aviable > 0:
-                        cart = Cart.objects.get(user=request.user, purchased=False)
                         product_cart = ProductCart()
                         product_cart.product = product
                         product_cart.cart = cart
                         product_cart.quantity = product.units_aviable
                         product_cart.save()
-                        cart.total_cost += (product.price * product_cart.quantity)
+                        tmp_total_cost=0
+                        for product_cart in ProductCart.objects.filter(cart=cart).all():
+                            tmp_total_cost += product_cart.quantity * product_cart.product.price
+                        cart.total_cost = tmp_total_cost
                         cart.save()
                         cart_serializer = CartSerializer(cart)
                         return Response(cart_serializer.data)
@@ -162,6 +167,7 @@ class ProductCartView(APIView):
                             "Message": "Not enough units aviable of product {0} with id {1}".format(product.name,
                                                                                                     product.id)},
                                         status=status.HTTP_401_UNAUTHORIZED)
+
             else:
                 return Response(data={"Message": "Product not found"}, status=status.HTTP_206_PARTIAL_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
