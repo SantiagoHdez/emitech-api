@@ -5,7 +5,7 @@ import 'rxjs/add/operator/catch';
 import { Observable } from 'rxjs/Observable';
 
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
-
+import { UserService } from './user.service';
 
 @Injectable()
 export class CartService {
@@ -13,12 +13,14 @@ export class CartService {
   private myCartProducts = [];
   private numProductos = 0;
   private url = "http://django-env.hsphtebmem.us-west-2.elasticbeanstalk.com";
-  constructor(private http:Http) { }
+  constructor(private http:Http, private auth: UserService) { }
 
 
   public get_product($id,$numProductos){
     this.numProductos = $numProductos;
     //let url = "http://127.0.0.1:8000/products/"+$id+"/?format=json";
+    let headers = new Headers();
+    this.auth.createTokenHeader(headers);
     return this.http.get(this.url+"/products/"+$id+"/?format=json")
     .map(this.extractData)
     .catch(this.catchError);
@@ -37,6 +39,8 @@ export class CartService {
   public send_cart_to_api($product){
       let $product_delete = Object.create($product);
       //let url = "http://127.0.0.1:8000/cart/1/";
+      let headers = new Headers();
+      this.auth.createTokenHeader(headers);
       delete $product_delete.name;
       delete $product_delete.model;
       delete $product_delete.price;
@@ -45,17 +49,16 @@ export class CartService {
       delete $product_delete.code;
       $product_delete['product_id'] = $product.id;
       delete $product_delete.id;      
-      return this.http.post(this.url+"/cart/1/",$product_delete)
+      return this.http.post(this.url+"/cart/",$product_delete, {headers:headers})
       .map(this.extractData)
       .catch(this.catchError);
-    //return this.http.post(url,$product)
-    //.map(this.extractData)
-    //.catch(this.catchError);
   }
 
   public send_payment_method_to_api($method){
     //let url = "http://127.0.0.1:8000/cart/1/ops/";
-    return this.http.post(this.url+"/cart/1/ops/",$method)
+    let headers = new Headers();
+    this.auth.createTokenHeader(headers);
+    return this.http.post(this.url+"/cart/1/ops/",$method, {headers:headers})
     .map(this.extractData)
     .catch(this.catchError);
 
@@ -63,6 +66,7 @@ export class CartService {
   public drop_product($id){
     let producto = {"product_id": String($id)};
     let headers = new Headers({ 'Content-Type': 'application/json' });
+    this.auth.createTokenHeader(headers);
     let options = new RequestOptions({ headers: headers, body: JSON.stringify({"product_id": String($id)}) });
     return this.http.delete(this.url+"/cart/1/", options)
     .map(this.extractData)

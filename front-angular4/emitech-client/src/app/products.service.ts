@@ -4,16 +4,19 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/catch';
 import { Observable } from 'rxjs/Observable';
 
-import { Http, Response } from '@angular/http';
+import { Http, Response, Headers } from '@angular/http';
+import { UserService } from './user.service';
 @Injectable()
 export class ProductsService {
   //private url = "http://django-env.hsphtebmem.us-west-2.elasticbeanstalk.com";
   private url = "http://localhost:8000"
-  constructor(private http : Http ) {
+  constructor(private http : Http, private auth:UserService ) {
   }
 
   getProductRegisterMachine($id){
-    return this.http.get(this.url+"/products/"+$id+"/?format=json")
+    let headers = new Headers();
+    this.auth.createTokenHeader(headers);
+    return this.http.get(this.url+"/products/upc/"+$id+"/?format=json", {headers:headers})
     .map(this.extractData)
     .do(this.logData)
     .catch(this.catchError);
@@ -21,21 +24,27 @@ export class ProductsService {
   
   getRegisteredProducts() {
     //return this.http.get("http://127.0.0.1:8000/products/?format=json")
-    return this.http.get(this.url+"/products/?format=json")
+    let headers = new Headers();
+    this.auth.createTokenHeader(headers);
+    return this.http.get(this.url+"/products/?format=json", {headers:headers})
     .map(this.extractData)
     .do(this.logData)
     .catch(this.catchError);
   }
   addNewProduct(product){
     //return this.http.post("http://127.0.0.1:8000/products/", product)
-    return this.http.post(this.url+"/products/",product)
+    let headers = new Headers();
+    this.auth.createTokenHeader(headers);
+    return this.http.post(this.url+"/products/",product,{headers:headers})
     .map(this.extractData)
     .do(this.logData)
     .catch(this.catchError);
   }
   updateProduct(id,product){
     //return this.http.put("http://127.0.0.1:8000/products/"+id+"/", product)
-    return this.http.put(this.url+"/products/"+id+"/",product)
+    let headers = new Headers();
+    this.auth.createTokenHeader(headers);
+    return this.http.put(this.url+"/products/"+id+"/",product, {headers:headers})
     .map(this.extractData)
     .do(this.logData)
     .catch(this.catchError);

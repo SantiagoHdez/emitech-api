@@ -61,7 +61,9 @@ export class RegistermachineComponent implements OnInit {
     this.actualProducts = this.registerMachineService.drop_products(this.pending_id_to_drop, $formValues.numProducts);
     this.toastyService.success("Has eliminado "+ $formValues.numProducts + " productos.");
     this.payment_money = this.registerMachineService.get_payment_mont();
-}
+  }
+
+  
 
 
   

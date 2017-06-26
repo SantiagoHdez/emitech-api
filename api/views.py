@@ -74,7 +74,7 @@ class ProductDetail(APIView):
             raise Http404
 
     def get(self, request, pk, format=None):
-        product = Product.objects.get(code=pk)
+        product = Product.objects.get(pk=pk)
         serializer = ProductSerializer(product)
         return Response(serializer.data)
 
