@@ -30,7 +30,7 @@
         <th>Modelo</th>
         <th>Precio</th>
         <th class="text-right">
-          <button class="btn btn-primary">
+          <button class="btn btn-primary" data-target="#paymentModal" data-toggle="modal">
             Proceder al pago
           </button>
         </th>
@@ -61,7 +61,7 @@
 
 
 
-
+<!-- Dialogo de confirmación -->
 <div class="modal fade" id="ConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <form [formGroup] = "dropProductRegisterMachine">
     
@@ -83,4 +83,35 @@
   </div>
   </form>
 
+</div>
+
+
+<!-- Realizar pago -->
+<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+       <form [formGroup] = "paymentFormHtml"  >
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Método de pago</h5>
+      </div>
+      <div class="modal-body">
+         
+          <div class="form-group">
+            <select name="paymentOptions" id="" class="form-control" formControlName="payment_method">
+              <option value="CC" > Tarjeta de crédito</option>
+              <option value="DC"> Tarjeta de débito</option>
+              <option value="CS"> Efectivo</option>
+              <option value="PY"> PAYPAL </option>
+
+            </select>
+          </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" data-dismiss="modal" (click) = "send_cart(paymentFormHtml.value)">Realizar compra</button>
+      </div>
+    </form>          
+    </div>
+  </div>
 </div>

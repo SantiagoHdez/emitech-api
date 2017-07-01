@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {Observable} from 'rxjs/Rx';
 
 //rubenmurga postcardfrom1952
 //client id bIjauvdthxsCOV9odYVUngdP1ZuQFazbM8CgkJKV
@@ -21,6 +22,8 @@ export class RegistermachineComponent implements OnInit {
   actualProducts = new Array();
   pending_id_to_drop = 0;
   payment_money = 0;
+
+  paymentFormHtml : FormGroup;
   constructor(private productService: ProductsService, private registerMachineService : RegisterMachineService,private toastyService:ToastyService) { }
 
   ngOnInit() {
@@ -31,6 +34,16 @@ export class RegistermachineComponent implements OnInit {
     this.dropProductRegisterMachine = new FormGroup({
       numProducts : new FormControl()
     });
+
+    this.paymentFormHtml = new FormGroup({
+      payment_method : new FormControl("",Validators.required)
+    });
+
+    Observable.interval(1 * 60).subscribe(x => {
+      this.payment_money = this.registerMachineService.get_payment_mont();
+    });
+    
+
   }
 
   look_for_product = function($formData){
@@ -39,11 +52,9 @@ export class RegistermachineComponent implements OnInit {
         this.registerMachineService.add_new_product($product);
         this.actualProducts = this.registerMachineService.get_products();
         this.toastyService.success("Se ha agregado el producto " +$product.name);
-        this.payment_money = this.registerMachineService.get_payment_mont();
-
       }catch($error){
         this.toastyService.error("No se ha podido agregar el producto.");
-      }  
+      }
     });
     this.registerMachineInputForm.reset({
       codigo_barras: ""
@@ -60,8 +71,15 @@ export class RegistermachineComponent implements OnInit {
   drop_product = function($formValues){
     this.actualProducts = this.registerMachineService.drop_products(this.pending_id_to_drop, $formValues.numProducts);
     this.toastyService.success("Has eliminado "+ $formValues.numProducts + " productos.");
-    this.payment_money = this.registerMachineService.get_payment_mont();
-}
+  }
+
+  
+  send_cart = function($formValues){
+    this.registerMachineService.send_payment_method_to_api($formValues).subscribe((data)=>{
+      this.toastyService.success("Se ha hecho el pago correctamente");
+      this.actualProducts = this.registerMachineService.get_products();
+    });    
+  };
 
 
   

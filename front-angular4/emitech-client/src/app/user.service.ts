@@ -27,7 +27,6 @@ export class UserService {
   get_token(){
     let headers = new Headers();
     this.createAuthorizationHeader(headers);
-    console.log(headers);
     var $data = new URLSearchParams();
     $data.set('username', this.user);
     $data.set('password', this.password);
