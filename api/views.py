@@ -9,12 +9,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, IsAdminUser, AllowAny
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, TokenHasScope
+from zeep import Client
 
 
 # Create your views here.
 
 class CreateUserView(APIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
     def post(self, request, format=None):
         user = User.objects.create_user(
@@ -27,7 +28,7 @@ class CreateUserView(APIView):
 
 
 class ProductList(APIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
     def get(self, request, format=None):
         products = Product.objects.all()
@@ -44,7 +45,7 @@ class ProductList(APIView):
 
 
 class ProductSearchByUPC(APIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
     def get(self, request, barcode, format=None):
         product = Product.objects.get(code=barcode)
@@ -83,21 +84,9 @@ class ProductCartView(APIView):
             tmp_cart = Cart()
             tmp_cart.user = request.user
             tmp_cart.save()
-            serializer = CartSerializer(tmp_cart)
         cart = Cart.objects.get(user=request.user, purchased=False)
         serializer = CartSerializer(cart)
         return Response(serializer.data)
-
-        # if User.objects.filter(pk=pk).exists():
-        #     if Cart.objects.filter(user_id=pk, purchased=False).exists() == False:
-        #         tmp_cart = Cart()
-        #         tmp_cart.user = User.objects.get(pk=pk)
-        #         tmp_cart.save()
-        #     cart = Cart.objects.get(user_id=pk, purchased=False)
-        #     serializer = CartSerializer(cart)
-        #     return Response(serializer.data)
-        # else:
-        #     raise Http404
 
     def post(self, request, format=None):
         serializer = CartProductSerializer(data=request.data)
@@ -110,8 +99,10 @@ class ProductCartView(APIView):
                 product = Product.objects.get(
                     pk=serializer.validated_data['product_id'])
 
-                if ProductCart.objects.filter(product_id=serializer.validated_data['product_id'], cart__user=request.user, cart__purchased=False).exists():
-                    product_cart = ProductCart.objects.get(product_id=serializer.validated_data['product_id'], cart__user=request.user, cart__purchased=False)
+                if ProductCart.objects.filter(product_id=serializer.validated_data['product_id'],
+                                              cart__user=request.user, cart__purchased=False).exists():
+                    product_cart = ProductCart.objects.get(product_id=serializer.validated_data['product_id'],
+                                                           cart__user=request.user, cart__purchased=False)
                     if product.units_aviable >= serializer.validated_data['quantity']:
                         cart = Cart.objects.get(user=request.user, purchased=False)
                         product_cart.quantity += serializer.validated_data['quantity']
@@ -138,7 +129,7 @@ class ProductCartView(APIView):
                         return Response(data={
                             "Message": "Not enough units aviable of product {0} with id {1}".format(product.name,
                                                                                                     product.id)},
-                                        status=status.HTTP_401_UNAUTHORIZED)
+                            status=status.HTTP_401_UNAUTHORIZED)
 
                 else:
                     cart = Cart.objects.get(user=request.user, purchased=False)
@@ -161,7 +152,7 @@ class ProductCartView(APIView):
                         product_cart.cart = cart
                         product_cart.quantity = product.units_aviable
                         product_cart.save()
-                        tmp_total_cost=0
+                        tmp_total_cost = 0
                         for product_cart in ProductCart.objects.filter(cart=cart).all():
                             tmp_total_cost += product_cart.quantity * product_cart.product.price
                         cart.total_cost = tmp_total_cost
@@ -172,11 +163,44 @@ class ProductCartView(APIView):
                         return Response(data={
                             "Message": "Not enough units aviable of product {0} with id {1}".format(product.name,
                                                                                                     product.id)},
-                                        status=status.HTTP_401_UNAUTHORIZED)
+                            status=status.HTTP_401_UNAUTHORIZED)
 
             else:
                 return Response(data={"Message": "Product not found"}, status=status.HTTP_206_PARTIAL_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, format=None):
+        serializer = CartProductSerializer(data=request.data)
+        if serializer.is_valid():
+            if Cart.objects.filter(user=request.user, purchased=False).exists() is False:
+                tmp_cart = Cart()
+                tmp_cart.user = request.user
+                tmp_cart.save()
+                raise Http404
+            if Product.objects.filter(pk=serializer.validated_data['product_id']).exists():
+                cart = Cart.objects.get(user=request.user, purchased=False)
+                if ProductCart.objects.filter(product_id=serializer.validated_data['product_id'],
+                                              cart_id=cart.id).exists():
+                    productcart = ProductCart.objects.get(product_id=serializer.validated_data['product_id'],
+                                              cart_id=cart.id)
+                    productcart.quantity = serializer.validated_data['quantity']
+                    productcart.save()
+                    tmp_total_cost = 0
+                    for product_cart in ProductCart.objects.filter(cart=cart).all():
+                        tmp_total_cost += product_cart.quantity * product_cart.product.price
+                    cart.total_cost = tmp_total_cost
+                    cart.save()
+                    cart_serializer = CartSerializer(cart)
+                    return Response(cart_serializer.data)
+                else:
+                    message = {"Message": "Product with ID {0} doesn't exist in cart".format(
+                        (serializer.validated_data['product_id']))}
+                    return Response(data=message, status=status.HTTP_404_NOT_FOUND)
+
+            else:
+                message= {"Message":"Product with ID {0} doesn't exist".format((serializer.validated_data['product_id']))}
+                return Response(data=message, status=status.HTTP_404_NOT_FOUND)
+
 
     def delete(self, request, format=None):
         serializer = CartProductSerializer(data=request.data)
@@ -189,9 +213,9 @@ class ProductCartView(APIView):
             if Product.objects.filter(pk=serializer.validated_data['product_id']).exists():
                 cart = Cart.objects.get(user=request.user, purchased=False)
                 if ProductCart.objects.filter(product_id=serializer.validated_data['product_id'],
-                                                       cart_id=cart.id).count()>1:
+                                              cart_id=cart.id).count() > 1:
                     for product_cart in ProductCart.objects.filter(product_id=serializer.validated_data['product_id'],
-                                                       cart_id=cart.id).all():
+                                                                   cart_id=cart.id).all():
                         cart.total_cost -= (product_cart.product.price *
                                             product_cart.quantity)
                         product_cart.delete()
