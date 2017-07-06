@@ -26,7 +26,6 @@ SECRET_KEY = '()2_^oiak(($co^i@9gy&ycn_gmvhw+dsg6pg9mkqqhv##@n5*'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'django-env.hsphtebmem.us-west-2.elasticbeanstalk.com',
     '127.0.0.1',
     'localhost',
 ]
@@ -74,13 +73,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ORIGIN_WHITELIST = (
-    'google.com',
-    'hostname.example.com',
-    'localhost:4200',
-    '127.0.0.1:9000',
-    'django-env.hsphtebmem.us-west-2.elasticbeanstalk.com'
-)
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'emitech.urls'
 
